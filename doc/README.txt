@@ -111,7 +111,11 @@ versions of Python, though it has not been tested.
 Installation
 ------------
 
-FIXME
+FIXME:
+
+- python setup.py install
+
+- easy_install [egg URL]
 
 
 Credits
