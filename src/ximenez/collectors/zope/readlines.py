@@ -4,8 +4,8 @@ collect Zope instances that are listed in a file.
 $Id$
 """
 
-from collectors.collector import Collector
-from shared.zope import ZopeInstance
+from ximenez.collectors.collector import Collector
+from ximenez.shared.zope import ZopeInstance
 
 
 def getInstance():

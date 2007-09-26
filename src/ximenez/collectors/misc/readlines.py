@@ -5,7 +5,7 @@ $Id$
 
 import os.path
 
-from collectors.collector import Collector
+from ximenez.collectors.collector import Collector
 
 
 def getInstance():
