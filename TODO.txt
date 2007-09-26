@@ -1,0 +1,27 @@
+- use "logging" package.
+
+- complete README
+
+- rewrite doc/usage.txt
+
+- review docstrings
+
+- add a LICENSE
+
+- add license-like preambule to each pertinent file.
+
+- add tests
+
+- regenerate "doc/api"
+
+- add setup.py and Makefile for developers. Use "entry_points" in
+  "setup.py" to create a "ximenez" script.
+
+- use 'optparse' instead of 'getopt'?
+
+
+- add better error handling in 'main()' and/or in the plug-ins
+  themselves.
+
+- add plug-in listing features, and "introspection" of the available
+  plug-ins (by printing the docstrings of the plug-in, for example).

@@ -1,0 +1,132 @@
+How to develop new plug-ins for Ximenez
+=======================================
+
+A plug-in in Ximenez is a class in a Python module. Depending on the
+kind of the plug-in (collector or acion), this class subclasses a
+particular abstract class and implements or overrides certain methods
+or attributes of this class.
+
+In other words, creating a new plug-in is only a matter of overriding
+methods and attributes. Hence, starting your new plug-in from a copy
+of an existing (and hopefully working) one is probably the best and
+most efficient way to get things done. It is recommended that you
+start your new plug-in from the following built-in plug-ins:
+
+- ``collectors/misc/readlines.py``
+
+- ``actions/misc/print.py``
+
+
+Creating a plug-in
+------------------
+
+FIXME: 
+
+Asking user input
+-----------------
+
+FIXME: the sub-sections below are too technical. A developer would
+read the source code if (s)he wants further details. This documentation should focus on ``_input_info`` more thoroughly.
+
+
+``_input_info``
+...............
+
+Default (inherited) value: ``ximenez.input.InputAware._input_info``
+
+This attribute is a tuple and defines what information the collector
+needs to know about. These informations are usually given by the user
+on the command line, or asked for by the collector itself (see
+``getInput()`` below).
+
+It has a default value (defined in ``ximenez.input.InputAware``, which
+is a mixin of ``Collector``): the empty tuple (``()``). However, since
+explicit is better than implicit, we strongly recommend that you
+override it in your plug-in. The content of this value is more thoroughly
+documented below (see `Asking user input`_).
+
+
+``_multiple_input``
+...................
+
+Default (inherited) value: ``ximenez.input.InputAware._multiple_input``
+
+This boolean tells whether or not the collector accepts multiple
+inputs (as defined in ``input_info``). It defaults to ``False``. If
+set to ``True``, the user will be asked indefinitely for the
+information listed in ``_input_info``, until (s)he presses ^C.
+
+
+``getInput()``
+..............
+
+Default (inherited) value: ``ximenez.input.InputAware.getInput()``
+
+If your plug-in does not need any input, you do not have to override
+this method in your plug-in: the default implementation will ask the
+user for input only if ``_input_info`` is not empty.
+
+If your plug-in does need an input, the user may have a chance to give
+it in the command line, instead of being prompted to enter it. In this
+case, the ``getInput()`` method is called. It defines how the plug-in
+should treat the arguments given in the command line. Default
+implementation is to suppose that the arguments are separated by
+``;;``. E.g.::
+
+    path=file.txt;;userid=bob
+
+For further details, see ``ximenez.input.InputAware.getInput()``. See
+also ``ximenez.collectors.misc.readlines.py`` for an example.
+
+
+Specificities of a collector plug-in
+------------------------------------
+
+FIXME: rewrite this part.
+
+Firstly you have to define a new module (i.e. a new file) and a new
+class within. This class should subclass (at least)
+``collectors.collector.Collector`` and may override the following
+attributes and methods.
+
+.. note::
+
+    Do not forget to define a ``getInstance()`` function in your
+    module. This function should return an instance of the class of
+    your plug-in.
+
+
+``collect()``
+.............
+
+At last, now that our plug-in knows everything it needs, it is time to
+actually collect things, since that is the very purpose of the
+collector.
+
+The ``collect()`` method shall return a sequence of any type of
+items. It will be up to the action plug-in to treat this sequence as
+it should.
+
+
+Specificities of an action plug-in
+----------------------------------
+
+Action plug-ins are very similar to collector plug-ins. So the
+instructions above also covers the process of creating a new action
+plug-in.
+
+The only difference is that an action does not have a ``collect()``
+method. It has an ``execute()`` method, though. This method takes a
+sequence of items (which is returned by the collector plug-in) and
+"does things" on each item.
+
+
+Additional comments
+-------------------
+
+Use docstrings in the class(es) and methods of your plug-ins. In the
+future, Ximenez may use them to provide help to the user by displaying
+docstrings of the plug-ins.
+
+If you think your plug-in should be included in Ximenez set of
+built-ins, do not hesitate to contact me.

@@ -1,0 +1,49 @@
+Hereunder are detailed the possible arguments which 'ximenez' can handle.
+
+
+Miscellaneous
+
+  -h, --help
+
+    Displays an help message and exits.
+
+  -v, --version
+
+    Displays 'ximenez' version number and exits.
+
+
+Collector
+
+  -c <collector>
+
+    Selects <collector> as the collector plug-in. <collector> can be a
+    file or the name of the plug-in. For example, <collector> may be
+    either 'collectors/misc/readlines.py' or 'misc.readlines' (but not
+    'misc.readlines.py').
+
+  --ci <input>
+
+    Provides input to the collector plug-in. If not given, the plug-in
+    will prompt the user for an input (if it needs to).
+
+
+Action
+
+  -a <action>
+
+    Selects <action> as the action plug-in. <action> can be a file or
+    the name of the plug-in. For example, <action> may be either
+    'actions/misc/print.py' or 'misc.print' (but not 'misc.print.py').
+
+  --ai <input>
+
+    Provides input to the action plug-in. If not given, the plug-in
+    will prompt the user for an input (if it needs to).
+
+
+Ouput
+
+  -o <output-file>, --output <output-file>
+
+      Logs to <ouput-file> instead of logging to the standard
+      output. This argument is optional.

@@ -1,0 +1,17 @@
+List of changes in Ximenez versions
+===================================
+
+
+What's new in Ximenez 0.7
+-------------------------
+
+- made changes to the code so that Ximenez can be installed (and not
+  only used from the source directory);
+
+- arranged and augmented documentation.
+
+
+What's new in Ximenez 0.6
+-------------------------
+
+- added logging-related features.
