@@ -11,10 +11,7 @@ methods and attributes. Hence, starting your new plug-in from a copy
 of an existing (and hopefully working) one is probably the best and
 most efficient way to get things done. It is recommended that you
 start your new plug-in from the following built-in plug-ins:
-
-- ``collectors/misc/readlines.py``
-
-- ``actions/misc/print.py``
+``collectors/misc/readlines.py`` or ``actions/misc/print.py``.
 
 
 Creating a plug-in

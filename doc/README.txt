@@ -5,8 +5,7 @@ Ximenez : a multi-purpose action performer
 
 The purpose of Ximenez is to execute an action on a set of collected
 items. Both the action and the way items are collected, are defined by
-Python modules, which are called plug-ins. Its three FIXME... among
-its FIXME are:
+Python modules, which are called plug-ins. This lets you:
 
 - execute a command (and retrieve its output) on a set of remote hosts
   (via SSH);
@@ -14,9 +13,10 @@ its FIXME are:
 - perform various actions on a set of Zope servers (add an user,
   change his/her password, remove an user, etc.);
 
-- any action that you are willing to write a Python plug-in for.
+- carry out any action that you are willing to write a Python plug-in
+  for.
 
-See the `Plugins`_ section below to know more about Ximenez built-in
+See the `Plug-ins`_ section below to know more about Ximenez built-in
 plug-ins and how to develop your own ones.
 
 
@@ -35,7 +35,10 @@ Hopefully, Ximenez comes with a number of useful plug-ins , e.g.::
 
     ximenez -c readlines -a print
 
-Optional arguments are available. See ``usage.txt`` for further details.
+Optional arguments are available. See `usage`_ for further
+details.
+
+.. _usage: usage.txt
 
 
 Plug-ins
@@ -72,6 +75,8 @@ Built-in collectors are:
 Actions
 .......
 
+Built-in actions are:
+
 ``misc.print``
   Logs (prints) each collected item. It can be quite useful when you
   are debugging a collector.
@@ -94,8 +99,9 @@ Actions
 Developing your own plug-ins
 ............................
 
-An exhaustive guide to develop your own plug-ins can be found in
-``plugins.txt``.
+There is an `exhaustive guide`_ to develop your own plug-ins.
+
+.. _exhaustive guide: develop-plugins.txt
 
 
 Requirements
@@ -132,7 +138,7 @@ program.
 .. _Pilot Systems: http://www.pilotsystems.net
 
 
-Licence
+License
 -------
 
 Ximenez is copyright 2008 by Damien Baty.
