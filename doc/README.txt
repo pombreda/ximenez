@@ -20,12 +20,22 @@ See the `Plug-ins`_ section below to know more about Ximenez built-in
 plug-ins and how to develop your own ones.
 
 
+.. warning::
+
+    Ximenez is already used in production. However, some action
+    plug-ins have known bugs. For example, Zope-related action
+    plug-ins fail in certain cases. If you encounter bugs, make sure
+    that you are using the trunk (see `Subversion repository`_ section
+    below) and contact the author: someone might very well be working
+    on a fix.
+
+
 Usage
 -----
 
 You can use Ximenez with the following command-line::
 
-    ximenez -c <collector> -a <action>
+    $ ximenez -c <collector> -a <action>
 
 ``<collector>`` and ``<action>`` are both plug-ins. The former gives
 Ximenez a set of items on which to act, and the latter is the action
@@ -33,7 +43,7 @@ to perform on each item of this set.
 
 Hopefully, Ximenez comes with a number of useful plug-ins , e.g.::
 
-    ximenez -c readlines -a print
+    $ ximenez -c misc.readlines -a misc.print
 
 Optional arguments are available. See `usage`_ for further
 details.
@@ -48,59 +58,10 @@ The main characteristic of Ximenez is that it can be extended to just
 do what you need to do, by using plug-ins. There are two kinds of
 plug-ins: collectors and actions.
 
-Ximenez ships with a set of built-in plug-ins.
+Ximenez ships with a set of `built-in plug-ins`_. You may also want to
+take a loo at the `exhaustive guide`_ to develop your own plug-ins.
 
-
-Collectors
-..........
-
-Built-in collectors are:
-
-``misc.readlines``
-  Collect values from a file (the values are the content of each
-  line).
-
-``ssh.readlines``
-  Collect a set of remote hosts from a file. Each line of the file
-  should be of the form ``<host>[:<ssh-port>]``).
-
-``zope.readlines``
-  Collect a set of Zope instances from a file. Each line of the file
-  should be of the form ``<host>[:<http-port>]``).
-
-``zope.instances``
-  Collect a set of Zope servers from an user's input.
-
-
-Actions
-.......
-
-Built-in actions are:
-
-``misc.print``
-  Logs (prints) each collected item. It can be quite useful when you
-  are debugging a collector.
-
-``ssh.remoteaction``
-  Execute a command on the collected set of remote hosts (via SSH) and
-  return its output.
-
-``zope.adduser``
-  Add a new user in the collected set of Zope instances.
-
-``zope.chpwduser``
-  Change password of an user in the collected set of Zope instances.
-
-``zope.rmuser``
-  Remove an user in the collected set of Zope instances.
-
-
-
-Developing your own plug-ins
-............................
-
-There is an `exhaustive guide`_ to develop your own plug-ins.
-
+.. _built-in plug-ins: builtin-plugins.txt
 .. _exhaustive guide: develop-plugins.txt
 
 
@@ -117,11 +78,26 @@ versions of Python, though it has not been tested.
 Installation
 ------------
 
-FIXME:
+If you have ``easy_install``, then the following should do the trick::
 
-- python setup.py install
+    $ easy_install Ximenez
 
-- easy_install [egg URL]
+For further details, see the `Installation`_ chapter
+
+.. _Installation: install.txt
+
+
+Subversion repository
+---------------------
+
+Ximenez source code lives in a Subversion repository. To checkout the
+trunk::
+
+    $ svn co https://svn.pilotsystems.net/projets/ximenez/trunk
+
+You can also `browse the sources`_ with the same URL.
+
+.. _`browse the sources`: https://svn.pilotsystems.net/projets/ximenez
 
 
 Credits
