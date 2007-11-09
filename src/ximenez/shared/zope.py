@@ -101,11 +101,11 @@ class ZopeInstance(object):
         if pas:
             path = 'acl_users/users'
             method = 'manage_addUser'
-            args = (userid, userid, pwd, pwd, None)
+            args = (userid, userid, pwd, pwd, [])
         else:
             path = 'acl_users'
             method = 'userFolderAddUser'
-            args = (userid, pwd, [ 'Manager' ], None)
+            args = (userid, pwd, [ 'Manager' ], [])
 
         self.performCall(manager, manager_pwd, path, method, args)
 
