@@ -22,6 +22,8 @@ instances via XML-RPC and tries to remove an user.
 $Id$
 """
 
+import logging
+
 from ximenez.actions.action import Action
 from ximenez.shared.zope import ZopeInstance
 
@@ -80,12 +82,11 @@ class ZopeUserRemover(Action):
                 instance = ZopeInstance(host, port)
             try:
                 instance.removeUser(userid, manager, manager_pwd)
-                self.log('Removed "%s" from "%s".' % (userid,
-                                                      instance))
+                logging.info('Removed "%s" from "%s".',
+                             userid, instance)
+            ## FIXME: try to catch "expected" exceptions, see
+            ## 'shared.zope'
             except:
-                msg = 'ERROR: Could not remove "%s" from "%s" '\
-                    'because of an unexpected exception. '% (userid,
-                                                             instance)
-                self.log(msg)
-                self.logLastTraceback()
-            self.endLogSection()
+                logging.error('Could not remove "%s" from "%s" '\
+                              'because of an unexpected exception.',
+                              userid, instance, exc_info=True)

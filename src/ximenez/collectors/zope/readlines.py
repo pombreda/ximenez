@@ -16,8 +16,8 @@
 ## along with this program.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-"""Define ZopeInstancesReadlinesCollector collector, which can
-collect Zope instances that are listed in a file.
+"""Define ``ZopeInstancesReadlines``, which can collect Zope instances
+that are listed in a file.
 
 $Id$
 """
@@ -27,13 +27,15 @@ from ximenez.shared.zope import ZopeInstance
 
 
 def getInstance():
-    """Return an instance of ZopeInstancesReadlinesCollector."""
-    return ZopeInstancesReadlinesCollector()
+    """Return an instance of ``ZopeInstancesReadlines``."""
+    return ZopeInstancesReadlines()
 
 
-class ZopeInstancesReadlinesCollector(Collector):
-    """A collector which returns instances of Zope servers that are listed
-    in a file.
+## FIXME: This class should sub-class 'collectors.misc.Readlines'.
+## This would simplify the implementation.
+class ZopeInstancesReadlines(Collector):
+    """A collector which returns instances of Zope servers that are
+    listed in a file.
 
     It asks for the pathname of the file whose lines should have the
     following format::
@@ -51,8 +53,8 @@ class ZopeInstancesReadlinesCollector(Collector):
 
 
     def getInput(self, cl_input=None):
-        """Get input from the user if what was provided in the command line
-        (available in ``cl_input``) was not sufficient.
+        """Get input from the user if what was provided in the command
+        line (available in ``cl_input``) was not sufficient.
 
         If a value is given in the command line (``cl_input``), we
         suppose it is the path of the file.

@@ -60,11 +60,9 @@ class ZopeInstance(object):
         except Fault, exc:
             if 'NotFound' in str(exc):
                 return False
-            print '---\n%s\n---\n' % exc
-            ## We have got an error which was not expected.
-            print 'Could not guess whether the server uses PAS or '\
-                'not, because of an unexpected XML-RPC error.'
-            traceback.print_exception(*sys.exc_info())
+            logging.error('Could not guess whether the server uses '\
+                          'PAS or not, because of an unexpected '\
+                          'XML-RPC error:', exc_info=True)
 
         ## No error. That means the server does use PAS.
         return True
@@ -79,6 +77,7 @@ class ZopeInstance(object):
                              allow_none=True)
         return getattr(server, method)(*args)
 
+
     def removeUser(self, userid, manager, manager_pwd):
         """Remove ``userid``."""
         if self.usesPAS(manager, manager_pwd):
@@ -90,23 +89,30 @@ class ZopeInstance(object):
             method = 'userFolderDelUsers'
             args = ((userid, ), )
 
-        ## FIXME: a 500 (internal server) error will probably be
-        ## raised if the user does not exist.
+        ## FIXME: catch exception when the user does not exist and
+        ## raise our own exception that will be caught in the plug-in.
+        ## With PAS, we get this:
+        ## KeyError, Invalid user ID: <userid>
         self.performCall(manager, manager_pwd, path, method, args)
 
+
     def addUser(self, userid, pwd, manager, manager_pwd):
-        """Remove ``userid``."""
+        """Add ``userid``."""
         pas = self.usesPAS(manager, manager_pwd)
-        
+
         if pas:
             path = 'acl_users/users'
             method = 'manage_addUser'
-            args = (userid, userid, pwd, pwd, [])
+            args = (userid, userid, pwd, pwd, None)
         else:
             path = 'acl_users'
             method = 'userFolderAddUser'
-            args = (userid, pwd, [ 'Manager' ], [])
+            args = (userid, pwd, ['Manager'], [])
 
+        ## FIXME: catch exception when the user already exists and
+        ## raise our own exception that will be caught in the plug-in.
+        ## With PAS, we get this:
+        ## KeyError: 'Duplicate user ID: <userid>'
         self.performCall(manager, manager_pwd, path, method, args)
 
         if pas:
@@ -114,11 +120,11 @@ class ZopeInstance(object):
             path = 'acl_users/roles'
             method = 'assignRoleToPrincipal'
             args = ('Manager', userid,)
-        self.performCall(manager, manager_pwd, path, method, args)            
+            self.performCall(manager, manager_pwd, path, method, args)
 
 
-    def modifyUserPassword(self, manager, manager_pwd,
-                           userid, password):
+    def modifyUserPassword(self, userid, password,
+                           manager, manager_pwd):
         """Set password of ``userid`` as ``password``."""
         if self.usesPAS(manager, manager_pwd):
             path = 'acl_users/users'
@@ -133,13 +139,18 @@ class ZopeInstance(object):
                                           manager, manager_pwd)
             args = (userid, password, roles, domains)
 
+        ## FIXME: catch exception when the user does not exist and
+        ## raise our own exception that will be caught in the plug-in.
+        ## With PAS, we get this:
+        ## KeyError, Invalid user ID: <userid>
         self.performCall(manager, manager_pwd, path, method, args)
 
 
     def downloadUserEditForm(self, userid, manager, manager_pwd):
         """Return HTML code of the edit form of the user.
 
-        **Warning:** this only works for standard user folder, not PAS.
+        **Warning:** this only works for standard user folder, not
+        PAS.
         """
         auth_handler = urllib2.HTTPBasicAuthHandler()
         auth_handler.add_password('Zope',
@@ -159,7 +170,8 @@ class ZopeInstance(object):
                      manager, manager_pwd):
         """Return roles of ``userid``.
 
-        **Warning:** this only works for standard user folder, not PAS.
+        **Warning:** this only works for standard user folder, not
+        PAS.
         """
         html = self.downloadUserEditForm(userid,
                                          manager, manager_pwd)
@@ -171,7 +183,8 @@ class ZopeInstance(object):
     def getUserDomains(self, userid, manager, manager_pwd):
         """Return domains of ``userid``.
 
-        **Warning:** this only works for standard user folder, not PAS.
+        **Warning:** this only works for standard user folder, not
+        PAS.
         """
         html = self.downloadUserEditForm(userid,
                                          manager, manager_pwd)

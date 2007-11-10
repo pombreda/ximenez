@@ -26,9 +26,9 @@ import sys
 import time
 import getopt
 import socket
+import logging
 import traceback
 
-from ximenez.log import Logger
 from ximenez.utils import getPluginInstance
 
 
@@ -58,17 +58,16 @@ Standard usage: %s -c <collector> -a <action>
 
 See the documentation for further details.""" % sys.argv[0]
 
+## Logging settings
+LOGGING_LEVEL = logging.INFO
+LOGGING_FORMAT = '%(asctime)s %(levelname)-8s %(message)s'
+LOGGING_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+## Global socket timout. Can be overriden by plug-ins, if needed.
 DEFAULT_TIMEOUT = 3
 socket.setdefaulttimeout(DEFAULT_TIMEOUT)
 
-
-def version():
-    """Print version."""
-    ## FIXME: this is not the right way to do it. 'VERSION.txt' will
-    ## not be installed.
-    f = open('VERSION.txt', 'r')
-    print 'Ximenez %s' % f.read()
-    f.close()
+__version__ = '0.8'
 
 
 def main():
@@ -103,7 +102,7 @@ def main():
             print USAGE
             sys.exit(0)
         elif option in ('-v', '--version'):
-            version()
+            print __version__
             sys.exit(0)
 
     ## A collector and an action are both required.
@@ -112,49 +111,43 @@ def main():
         print USAGE
         sys.exit(1)
 
-    if output_path:
-        output = open(output_path, 'a+')
-    else:
-        output = sys.__stdout__
+    ## Set logger settings
+    log_settings = {'level': LOGGING_LEVEL,
+                    'format': LOGGING_FORMAT,
+                    'datefmt': LOGGING_DATE_FORMAT}
+    if output_path is not None:
+        log_settings['filename'] = output_path
+    logging.basicConfig(**log_settings)
 
     ## Retrieve an instance of the collector plug-in.
     try:
         collector = getPluginInstance(collector, 'collectors')
     except ImportError:
-        print 'Error: could not import "%s" plug-in. '\
-            'Got the following exception:' % collector
-        traceback.print_exc()
+        logging.critical('Could not import "%s" collector plug-in. '\
+                         'Got the following exception:',
+                         collector, exc_info=True)
         sys.exit(1)
 
     ## Retrieve an instance of the action plug-in.
     try:
         action = getPluginInstance(action, 'actions')        
     except ImportError:
-        print 'Error: could not import "%s" plug-in. '\
-            'Got the following exception:' % action
-        traceback.print_exc()
+        logging.critical('Could not import "%s" action plug-in. '\
+                         'Got the following exception:',
+                         action, exc_info=True)
         sys.exit(1)
-
-    ## Set logger for each plug-in.
-    logger = Logger(output)
-    collector.setLogger(logger)
-    action.setLogger(logger)
 
     ## Do the job.
     start_time = time.time()
-    logger.log("Started 'ximenez' session: '%s'." % ' '.join(sys.argv[1:]))
+    logging.info("Started Ximenez session: '%s'." % ' '.join(sys.argv[1:]))
     collector.getInput(collector_input)
     sequence = collector.collect()
-    logger.log('Collected %d items.' % len(sequence))
+    logging.info('Collected %d items.' % len(sequence))
     action.getInput(action_input)
     action.execute(sequence)
-    end_time = time.time()
-    elapsed = end_time - start_time
-    logger.log('Executed action in %d seconds.' % (elapsed))
-    logger.endSection()
+    elapsed = time.time() - start_time
+    logging.info('Executed action in %d seconds.' % (elapsed))
 
-    if output_path:
-        output.close()
 
 if __name__ == "__main__":
     main()

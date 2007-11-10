@@ -27,11 +27,11 @@ from ximenez.collectors.collector import Collector
 
 
 def getInstance():
-    """Return an instance of ReadLinesCollector."""
-    return ReadLinesCollector()
+    """Return an instance of ``ReadLines``."""
+    return ReadLines()
 
 
-class ReadLinesCollector(Collector):
+class ReadLines(Collector):
     """A very simple collector which asks for the path of a file and
     returns a tuple containing each line of this file.
     """
@@ -44,8 +44,8 @@ class ReadLinesCollector(Collector):
 
 
     def getInput(self, cl_input=None):
-        """Get input from the user if what was provided in the command line
-        (available in ``cl_input``) was not sufficient.
+        """Get input from the user if what was provided in the command
+        line (available in ``cl_input``) was not sufficient.
 
         If a value is given in the command line (``cl_input``), we
         suppose it is the path of the file.
@@ -58,7 +58,9 @@ class ReadLinesCollector(Collector):
 
 
     def collect(self):
-        """Return lines of the file at ``path``, as a tuple."""
+        """Return lines of the file at ``path`` (without "end of line"
+        characters), as a tuple.
+        """
         path = self._input['path']
         lines = open(path, 'r').readlines()
         return [line.rstrip('\n\r') for line in lines]

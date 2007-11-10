@@ -41,15 +41,9 @@ class SSHRemoteHost(object):
         return representation
 
 
-    ## FIXME: is this really useful?
-    def setUser(self, user):
-        """Set user for a future connection."""
-        self.user = user
-
-
     def execute(self, command):
-        """Execute ``command`` on the remote host via SSH and returns
-        the output.
+        """Execute ``command`` on the remote host via SSH and return the
+        output.
 
         This method takes care of escaping ``command`` if needed.
         """

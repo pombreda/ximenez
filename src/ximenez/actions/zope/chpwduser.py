@@ -22,6 +22,8 @@ instances via XML-RPC and tries to change the password of an user.
 $Id$
 """
 
+import logging
+
 from ximenez.actions.action import Action
 from ximenez.shared.zope import ZopeInstance
 
@@ -89,12 +91,12 @@ class ZopePasswordModifier(Action):
             try:
                 instance.modifyUserPassword(userid, password,
                                             manager, manager_pwd)
-                self.log('Changed password of "%s" in '\
-                         '"%s".' % (userid, instance))
+                logging.info('Changed password of "%s" in "%s".',
+                             userid, instance)
+            ## FIXME: try to catch "expected" exceptions, see
+            ## 'shared.zope'
             except:
-                self.log('ERROR: Could not change password of "%s" '\
-                         'in "%s" because of an unexpected '\
-                         'exception. '% (userid,
-                                         instance))
-                self.logLastTraceback()
-            self.endLogSection()
+                logging.error('Could not change password of "%s" '\
+                              'in "%s" because of an unexpected '\
+                              'exception.',
+                              userid, instance, exc_info=True)

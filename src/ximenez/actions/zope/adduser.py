@@ -16,11 +16,13 @@
 ## along with this program.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-"""Define ZopeUserAdder, a plug-in which connects to Zope instances
-via XML-RPC and tries to create a Manager user.
+"""Define ``ZopeUserAdder``, a plug-in which connects to Zope
+instances via XML-RPC and tries to create a Manager user.
 
 $Id$
 """
+
+import logging 
 
 from ximenez.actions.action import Action
 from ximenez.shared.zope import ZopeInstance
@@ -32,8 +34,8 @@ def getInstance():
 
 
 class ZopeUserAdder(Action):
-    """An action which removes an user from a collection of Zope
-    instances, via XML-RPC."""
+    """An action which adds an user to a collection of Zope instances
+    via XML-RPC."""
 
     _input_info = ()
 
@@ -85,14 +87,10 @@ class ZopeUserAdder(Action):
                 instance = ZopeInstance(host, port)
             try:
                 instance.addUser(userid, pwd, manager, manager_pwd)
-                self.log('Added "%s" to "%s".' % (userid,
-                                                      instance))
+                logging.info('Added "%s" to "%s".', userid, instance)
+            ## FIXME: try to catch "expected" exceptions, see
+            ## 'shared.zope'
             except:
-                ## FIXME: this should work (and should be used):
-                ##      self.log('mlklmk', userid, instance)
-                msg = 'ERROR: Could not add "%s" to "%s" '\
-                    'because of an unexpected exception. '% (userid,
-                                                             instance)
-                self.log(msg)
-                self.logLastTraceback()
-            self.endLogSection()
+                logging.error('Could not add "%s" to "%s" '\
+                              'because of an unexpected exception:',
+                              userid, instance, exc_info=True)

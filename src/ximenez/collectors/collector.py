@@ -21,15 +21,14 @@
 $Id$
 """
 
-from ximenez.log import LoggerAware
 from ximenez.input import InputAware
 
 
-class Collector(object, InputAware, LoggerAware):
+class Collector(object, InputAware):
     """The purpose of a collector is to collect information.
 
     ``Collector`` is an abstract class which real collector plug-ins
-    should subclass.
+    must subclass.
     """
 
     def collect(self):

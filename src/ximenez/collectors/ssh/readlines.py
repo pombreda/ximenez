@@ -16,8 +16,8 @@
 ## along with this program.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-"""Define SSHRemoteHostsReadlinesCollector, which can collect SSH
-remote hosts instances which are listed in a file.
+"""Define ``SSHRemoteHostsReadlines``, which can collect SSH remote
+hosts instances that are listed in a file.
 
 $Id$
 """
@@ -27,12 +27,12 @@ from ximenez.shared.ssh import SSHRemoteHost
 
 
 def getInstance():
-    """Return an instance of ``SSHRemoteHostsReadlinesCollector``."""
-    return SSHRemoteHostsReadlinesCollector()
+    """Return an instance of ``SSHRemoteHostsReadlines``."""
+    return SSHRemoteHostsReadlines()
 
 
-class SSHRemoteHostsReadlinesCollector(Collector):
-    """A collector which returns instances of SSH remote hosts which
+class SSHRemoteHostsReadlines(Collector):
+    """A collector which returns instances of SSH remote hosts that
     are listed in a file.
 
     It asks for the pathname of the file, whose lines should have the
@@ -43,7 +43,7 @@ class SSHRemoteHostsReadlinesCollector(Collector):
     ``<port>`` is optional. If not given, it is supposed to be the
     default SSH port (22).
 
-    Returns a tuple of ``SSHRemoteHost`` instances.
+    This method returns a tuple of ``SSHRemoteHost`` instances.
     """
 
     _input_info = ({'name': 'path',
@@ -54,8 +54,8 @@ class SSHRemoteHostsReadlinesCollector(Collector):
 
 
     def getInput(self, cl_input=None):
-        """Get input from the user if what was provided in the command line
-        (available in ``cl_input``) was not sufficient.
+        """Get input from the user if what was provided in the command
+        line (available in ``cl_input``) was not sufficient.
 
         If a value is given in the command line (``cl_input``), we
         suppose it is the path of the file.

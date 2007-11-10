@@ -16,21 +16,24 @@
 ## along with this program.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-"""Define SSHRemoteAction, a plug-in which can execute a command on a
+"""Define ``SSHRemote``, a plug-in which can execute a command on a
 remote host via SSH.
 
 $Id$
 """
 
+import os
+import logging
+
 from ximenez.actions.action import Action
 
 
 def getInstance():
-    """Return an instance of SSHRemoteAction."""
-    return SSHRemoteAction()
+    """Return an instance of ``SSHRemote``."""
+    return SSHRemote()
 
 
-class SSHRemoteAction(Action):
+class SSHRemote(Action):
     """Connect to remote hosts via SSH, execute a command and return
     its output.
     """
@@ -60,6 +63,6 @@ class SSHRemoteAction(Action):
         """
         command = self._input['command']
         for item in sequence:
-            self.log('Executing "%s" on "%s"\n' % (command, item))
-            self.log(item.execute(command), no_date=True)
-            self.endLogSection()
+            output = item.execute(command)
+            logging.info('Executing "%s" on "%s": %s%s',
+                         command, item, os.sep, output)

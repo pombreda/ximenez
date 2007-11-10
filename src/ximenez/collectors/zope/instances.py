@@ -16,7 +16,7 @@
 ## along with this program.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-"""Define ZopeInstances collector, which can collect Zope instances.
+"""Define ``ZopeInstances``, which can collect Zope instances.
 
 $Id$
 """
@@ -26,11 +26,11 @@ from ximenez.shared.zope import ZopeInstance
 
 
 def getInstance():
-    """Return an instance of ZopeInstancesCollector."""
-    return ZopeInstancesCollector()
+    """Return an instance of ``ZopeInstances``."""
+    return ZopeInstances()
 
 
-class ZopeInstancesCollector(Collector):
+class ZopeInstances(Collector):
     """A collector which returns instances of Zope servers.
 
     It asks for the location of the host (which can be its IP or its
