@@ -1,6 +1,18 @@
 List of changes in Ximenez versions
 ===================================
 
+What's new in Ximenez 0.8
+-------------------------
+
+- added a set of tests. Still incomplete, but ready to be written. ;)
+
+- replaced hand-made ``log`` module by standard ``logging`` package;
+
+- reviewed docstrings;
+
+- ``Collector`` and ``Action`` suffixes were removed from collectors
+  and actions classes names.
+
 
 What's new in Ximenez 0.7
 -------------------------
