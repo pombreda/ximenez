@@ -16,8 +16,8 @@
 ## along with this program.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-"""Define ``SSHRemote``, a plug-in which can execute a command on a
-remote host via SSH.
+"""Define ``SSHRemote``, a plug-in which can execute a command
+on a remote host via SSH.
 
 $Id$
 """
@@ -64,5 +64,5 @@ class SSHRemote(Action):
         command = self._input['command']
         for item in sequence:
             output = item.execute(command)
-            logging.info('Executing "%s" on "%s": %s%s',
-                         command, item, os.sep, output)
+            logging.info('Executing "%s" on "%s":%s%s',
+                         command, item, os.linesep, output)
