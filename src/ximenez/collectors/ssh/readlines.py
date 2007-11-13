@@ -22,8 +22,8 @@ hosts instances that are listed in a file.
 $Id$
 """
 
-from ximenez.collectors.collector import Collector
 from ximenez.shared.ssh import SSHRemoteHost
+from ximenez.collectors.misc.readlines import ReadLines as BaseReadlinesCollector
 
 
 def getInstance():
@@ -31,7 +31,7 @@ def getInstance():
     return SSHRemoteHostsReadlines()
 
 
-class SSHRemoteHostsReadlines(Collector):
+class SSHRemoteHostsReadlines(BaseReadlinesCollector):
     """A collector which returns instances of SSH remote hosts that
     are listed in a file.
 
@@ -46,32 +46,10 @@ class SSHRemoteHostsReadlines(Collector):
     This method returns a tuple of ``SSHRemoteHost`` instances.
     """
 
-    _input_info = ({'name': 'path',
-                    'prompt': 'File: ',
-                    'required': True},
-                   )
-    _multiple_input = False
-
-
-    def getInput(self, cl_input=None):
-        """Get input from the user if what was provided in the command
-        line (available in ``cl_input``) was not sufficient.
-
-        If a value is given in the command line (``cl_input``), we
-        suppose it is the path of the file.
-        """
-        if cl_input:
-            self._input['path'] = cl_input
-        else:
-            ## Back to the default implementation
-            Collector.getInput(self, cl_input)
-
-
     def collect(self):
-        """Return a tuple of ``ZopeInstance`` instances."""
-        lines = open(self._input['path']).readlines()
+        """Return a tuple of ``SSHRemoteHost`` instances."""
         instances = []
-        for line in lines:
+        for line in BaseReadlinesCollector.collect(self):
             if ':' not in line:
                 host = line.strip()
                 port = None
