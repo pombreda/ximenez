@@ -16,8 +16,9 @@
 ## along with this program.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-"""Define ``ZopePasswordModifier``, a plug-in which connects to Zope
-instances via XML-RPC and tries to change the password of an user.
+"""Define ``ZopeUserPasswordModifier``, a plug-in which connects to
+Zope instances via XML-RPC and tries to change the password of an
+user.
 
 $Id$
 """
@@ -29,11 +30,11 @@ from ximenez.shared.zope import ZopeInstance
 
 
 def getInstance():
-    """Return an instance of ZopePasswordModifier."""
-    return ZopePasswordModifier()
+    """Return an instance of ``ZopeUserPasswordModifier``."""
+    return ZopeUserPasswordModifier()
 
 
-class ZopePasswordModifier(Action):
+class ZopeUserPasswordModifier(Action):
     """An action which changes the password of an user from a
     collection of Zope instances, via XML-RPC.
     """
