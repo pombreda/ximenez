@@ -77,6 +77,7 @@ class InputAware:
             {'name': <string>,
              'prompt': <string>,
              'required': <boolean>,
+             'default': <string>,
              'hidden': <boolean>,
              'validators': <sequence of strings or callables>,
             }
@@ -91,11 +92,14 @@ class InputAware:
         - ``required`` is an optional boolean which tells whether or
           not the user input is required. Default is ``False``;
 
+        - ``default`` is a default value given to the argument if no
+          value is given (though only if it is not reduired);
+
         - ``hidden`` is an optional boolean which tells whether the
           user input has to be hidden (e.g. for a password). Default
           is ``False``;
 
-        - validators is an optional sequence of validators. Each
+        - ``validators`` is an optional sequence of validators. Each
           validator may be either a string (which should be method of
           the plug-in) or a callable (a function, a lambda expression,
           etc.)
@@ -146,7 +150,9 @@ class InputAware:
                 ask = raw_input
                 if info.get('hidden'):
                     ask = getpass
-                value = ask(info['prompt'])                    
+                value = ask(info['prompt'])
+                if not info.get('required') and info.get('default'):
+                    value = info['default']
                 if value or not info.get('required'):
                     if _validate(info.get('validators', ()), value):
                         input[info['name']] = value
