@@ -34,10 +34,9 @@ DOMAINS_REGEXP = re.compile('''<INPUT TYPE="TEXT" NAME="domains:tokens" SIZE="30
 
 class ZopeInstance(object):
     """Represent an instance of a Zope server."""
-    def __init__(self, host, port, version=None):
+    def __init__(self, host, port):
         self.host = host
         self.port = port
-        self.version = version
 
 
     def __repr__(self):
