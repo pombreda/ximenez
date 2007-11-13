@@ -1,27 +1,14 @@
-- use "logging" package.
+- write more tests
 
-- complete README
+- remove 'VERSION.txt'
 
-- rewrite doc/usage.txt
-
-- review docstrings
-
-- add a LICENSE
-
-- add license-like preambule to each pertinent file.
-
-- add tests
+- use 'optparse' instead of 'getopt'
 
 - regenerate "doc/api"
 
-- add setup.py and Makefile for developers. Use "entry_points" in
-  "setup.py" to create a "ximenez" script.
-
-- use 'optparse' instead of 'getopt'?
-
-
 - add better error handling in 'main()' and/or in the plug-ins
-  themselves.
+  themselves. At least, I would like a global "try:... except:..."
+  clause in 'xim.py:main()'.
 
 - add plug-in listing features, and "introspection" of the available
-  plug-ins (by printing the docstrings of the plug-in, for example).
+  plug-ins (by printing the docstring of the plug-ins, for example).
