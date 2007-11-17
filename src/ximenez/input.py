@@ -23,7 +23,7 @@ $Id$
 
 try:
     import readline
-except:
+except ImportError:
     pass ## No support for 'readline'.
     ## FIXME: auto-completion features will not work. We have to take
     ## care of this.
