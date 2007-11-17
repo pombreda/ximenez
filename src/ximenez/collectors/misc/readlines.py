@@ -21,8 +21,6 @@
 $Id$
 """
 
-import os.path
-
 from ximenez.collectors.collector import Collector
 
 

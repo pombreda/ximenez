@@ -27,7 +27,6 @@ import time
 import getopt
 import socket
 import logging
-import traceback
 
 from ximenez.utils import getPluginInstance
 

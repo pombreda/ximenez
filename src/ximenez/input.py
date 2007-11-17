@@ -16,7 +16,7 @@
 ## along with this program.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-"""Define ``InputAware`` mixin.l
+"""Define ``InputAware`` mixin.
 
 $Id$
 """
@@ -27,6 +27,7 @@ except:
     pass ## No support for 'readline'.
     ## FIXME: auto-completion features will not work. We have to take
     ## care of this.
+import logging
 from getpass import getpass
 from types import StringType
 
@@ -125,6 +126,7 @@ class InputAware:
         """
 
         def _validate(validators, value):
+            """Run ``validators`` on ``value``."""
             for validator in validators:
                 error = False
                 if type(validator) == StringType:
@@ -137,14 +139,13 @@ class InputAware:
                     if not validator(value):
                         return False
                 if error:
-                    print 'Could not infer what to do with this '\
-                        'validator: %s' % validator
-                    sys.exit(1)
+                    logging.error('Could not infer what to do with '\
+                                  'this validator: %s', validator)
             return True
 
         if input_info is None:
             input_info = self.getInputInfo()
-        input = {}
+        user_input = {}
         for info in input_info:
             while 1:
                 ask = raw_input
@@ -155,19 +156,19 @@ class InputAware:
                     value = info['default']
                 if value or not info.get('required'):
                     if _validate(info.get('validators', ()), value):
-                        input[info['name']] = value
+                        user_input[info['name']] = value
                         break
-        return input
+        return user_input
 
 
     def askForMultipleInput(self):
         """Ask user for more than one input, until (s)he presses
          ``^C``.
         """
-        input = []
+        user_input = []
         while True:
             try:
-                input.append(self.askForInput())
+                user_input.append(self.askForInput())
             except KeyboardInterrupt:
                 break
-        return input
+        return user_input

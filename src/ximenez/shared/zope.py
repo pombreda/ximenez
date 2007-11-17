@@ -22,10 +22,10 @@ $Id$
 """
 
 import re
-import sys
+import logging
 import urllib2
-import traceback
-from xmlrpclib import ServerProxy, Fault
+from xmlrpclib import Fault
+from xmlrpclib import ServerProxy
 
 ROLES_REGEXP = re.compile('''<OPTION VALUE="(?:(.*))"(?:(.*))>''')
 DOMAINS_REGEXP = re.compile('''<INPUT TYPE="TEXT" NAME="domains:tokens" SIZE="30"
@@ -50,12 +50,12 @@ class ZopeInstance(object):
         We do that by trying an XML-RPC request on a method which the
         standard user folder does not implemente, whereas PAS does.
         """
-        s = ServerProxy('http://%s:%s@%s:%s/acl_users' % (manager,
-                                                          manager_pwd,
-                                                          self.host,
-                                                          self.port))
+        server = ServerProxy('http://%s:%s@%s:%s/acl_users' % (manager,
+                                                               manager_pwd,
+                                                               self.host,
+                                                               self.port))
         try:
-            s.searchPrincipals()
+            server.searchPrincipals()
         except Fault, exc:
             if 'NotFound' in str(exc):
                 return False
@@ -68,6 +68,7 @@ class ZopeInstance(object):
 
 
     def performCall(self, manager, manager_pwd, path, method, args):
+        """Perform XML-RPC call on the current Zope instance."""
         server = ServerProxy('http://%s:%s@%s:%s/%s' % (manager,
                                                         manager_pwd,
                                                         self.host,
