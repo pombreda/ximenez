@@ -46,6 +46,14 @@ class ZopeInstancesReadlinesTestCase(XimenezPluginTestCase):
         self.failUnless(str(collected[2]) == 'localhost:8101')
 
 
+def test_suite():
+    import unittest
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(ZopeInstancesTestCase))
+    suite.addTest(unittest.makeSuite(ZopeInstancesReadlinesTestCase))
+    return suite
+
+
 if __name__ == '__main__':
     import unittest
     unittest.main()

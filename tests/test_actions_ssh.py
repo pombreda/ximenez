@@ -34,6 +34,13 @@ class SSHRemoteActionTestCase(XimenezPluginTestCase):
         self.clearLog()
 
 
+def test_suite():
+    import unittest
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(SSHRemoteActionTestCase))
+    return suite
+
+
 if __name__ == '__main__':
     import unittest
     unittest.main()

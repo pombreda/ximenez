@@ -26,6 +26,13 @@ class ReadLinesTestCase(XimenezPluginTestCase):
         self.failUnless(collected == ['first', 'second', 'third'])
 
 
+def test_suite():
+    import unittest
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(ReadLinesTestCase))
+    return suite
+
+
 if __name__ == '__main__':
     import unittest
     unittest.main()

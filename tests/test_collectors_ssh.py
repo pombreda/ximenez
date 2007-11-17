@@ -48,6 +48,14 @@ class SSHRemoteHostsReadlinesTestCase(XimenezPluginTestCase):
         self.failUnless(str(collected[1]) == '127.0.0.1:22')
 
 
+def test_suite():
+    import unittest
+    suite = unittest.TestSuite()
+    suite.addTest(unittest.makeSuite(SSHInstancesTestCase))
+    suite.addTest(unittest.makeSuite(SSHRemoteHostsReadlinesTestCase))
+    return suite
+
+
 if __name__ == '__main__':
     import unittest
     unittest.main()

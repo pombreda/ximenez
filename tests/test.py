@@ -18,6 +18,6 @@ def test_suite():
             suite.addTests(module.test_suite())
     return suite
 
-if __name__ == '__main__': 
-    ## FIXME: this is broken (an error is raised in 'unittest')
+
+if __name__ == '__main__':
     unittest.main(defaultTest='test_suite')

@@ -57,10 +57,10 @@ class SSHTestCase(XimenezTestCase):
 
 
 def test_suite():
-    ## FIXME: broken. See 'test.py'
     import unittest
     suite = unittest.TestSuite()
-    suite.addTests((ZopeTestCase, SSHTestCase))
+    suite.addTest(unittest.makeSuite(ZopeTestCase))
+    suite.addTest(unittest.makeSuite(SSHTestCase))
     return suite
 
 if __name__ == '__main__':
