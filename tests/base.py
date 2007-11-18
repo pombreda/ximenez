@@ -1,4 +1,4 @@
-"""Base classes and utility method for Ximenez tests.
+"""Base classes and utility classes and methods for Ximenez tests.
 
 $Id$
 """
@@ -6,32 +6,40 @@ $Id$
 import os.path
 import unittest
 
+## Monkey-patch ``input`` and ``getpass.getpass``
+from fakeinput import FakeInput
+import ximenez.input
+ximenez.input.xim_raw_input = FakeInput()
+import ximenez
+ximenez.input.xim_getpass = ximenez.input.xim_raw_input
+from ximenez.input import xim_raw_input
+
+
 ## Monkey-patch ``logging`` so that we can test what is logged.
-if True:
-    import logging
-    from logging import Logger, getLogger
-    from ximenez.xim import LOGGING_LEVEL
+import logging
+from logging import Logger, getLogger
+from ximenez.xim import LOGGING_LEVEL
 
-    logging.basicConfig(level=LOGGING_LEVEL)
+logging.basicConfig(level=LOGGING_LEVEL)
 
-    def _log(self, level, msg, args, exc_info=None):
-        """My own log() method"""
-        stack = self.getStack()
-        stack.append(msg % args)
-        ## FIXME: this is a bit basic, for now:
-        ## - what if exc_info is True?
-        ## - do we want to check log records level (severity)?
+def _log(self, level, msg, args, exc_info=None):
+    """My own log() method"""
+    stack = self.getStack()
+    stack.append(msg % args)
+    ## FIXME: this is a bit basic, for now:
+    ## - what if exc_info is True?
+    ## - do we want to check log records level (severity)?
 
-    def getStack(self):
-        if not hasattr(self, '_stack'):
-            clearStack(self)
-        return self._stack
+def getStack(self):
+    if not hasattr(self, '_stack'):
+        clearStack(self)
+    return self._stack
 
-    def clearStack(self): self._stack = []
+def clearStack(self): self._stack = []
 
-    Logger._log = _log
-    Logger.getStack = getStack
-    Logger.clearStack = clearStack
+Logger._log = _log
+Logger.getStack = getStack
+Logger.clearStack = clearStack
 
 
 class XimenezTestCase(unittest.TestCase):

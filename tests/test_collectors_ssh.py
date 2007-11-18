@@ -3,7 +3,9 @@
 $Id$
 """
 
-from base import XimenezPluginTestCase, getCompletePathOfTestFile
+from base import xim_raw_input
+from base import XimenezPluginTestCase
+from base import getCompletePathOfTestFile
 
 from ximenez.shared.ssh import SSHRemoteHost
 from ximenez.collectors.ssh import instances
@@ -12,6 +14,22 @@ from ximenez.collectors.ssh import readlines
 
 class SSHInstancesTestCase(XimenezPluginTestCase):
     """Test ``collectors.ssh.instances``."""
+
+    def test_input(self):
+        hosts = [{'host': 'host1',
+                  'port': '22'},
+                 {'host': 'host2',
+                  'port': '222'}]
+
+        plugin = instances.getInstance()
+        xim_raw_input.initializeLines(('host1', '22',
+                                       'host2', '222',
+                                       KeyboardInterrupt))
+        plugin.getInput()
+        self.failUnless(plugin._input == hosts)
+        self.failUnless(xim_raw_input.hasFinished())
+        xim_raw_input.resetLines()
+
 
     def test_collect(self):
         plugin = instances.getInstance()
@@ -33,9 +51,18 @@ class SSHRemoteHostsReadlinesTestCase(XimenezPluginTestCase):
 
     def test_input(self):
         plugin = readlines.getInstance()
+
+        ## Manual input
         path = '/path/to/file'
         plugin.getInput(cl_input=path)
         self.failUnless(plugin._input['path'] == path)
+
+        ## User input
+        xim_raw_input.initializeLines((path, ))
+        plugin.getInput()
+        self.failUnless(plugin._input['path'] == path)
+        self.failUnless(xim_raw_input.hasFinished())
+        xim_raw_input.resetLines()
 
 
     def test_collect(self):

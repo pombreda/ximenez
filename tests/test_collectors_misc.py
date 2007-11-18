@@ -3,7 +3,9 @@
 $Id$
 """
 
-from base import XimenezPluginTestCase, getCompletePathOfTestFile
+from base import xim_raw_input
+from base import XimenezPluginTestCase
+from base import getCompletePathOfTestFile
 
 from ximenez.collectors.misc.readlines import getInstance
 
@@ -13,9 +15,18 @@ class ReadLinesTestCase(XimenezPluginTestCase):
 
     def test_input(self):
         plugin = getInstance()
+
+        ## Manual input
         path = '/path/to/file'
         plugin.getInput(cl_input=path)
         self.failUnless(plugin._input['path'] == path)
+
+        ## User input
+        xim_raw_input.initializeLines((path, ))
+        plugin.getInput()
+        self.failUnless(plugin._input['path'] == path)
+        self.failUnless(xim_raw_input.hasFinished())
+        xim_raw_input.resetLines()
 
 
     def test_collect(self):
