@@ -32,6 +32,15 @@ from getpass import getpass
 from types import StringType
 
 
+## We define wrappers around ``raw_input`` and ``getpass.getpass`` so
+## that we can fake input in our tests (see ``tests.fakeinput``).
+def xim_raw_input(prompt=None):
+    raw_input(prompt)
+
+def xim_getpass(prompt=None, stream=None):
+    getpass(prompt, stream)
+
+
 ## FIXME: would be nice to better format text (e.g. print errors in
 ## bold red).
 class InputAware:
@@ -148,11 +157,12 @@ class InputAware:
         user_input = {}
         for info in input_info:
             while 1:
-                ask = raw_input
+                ask = xim_raw_input
                 if info.get('hidden'):
-                    ask = getpass
+                    ask = xim_getpass
                 value = ask(info['prompt'])
-                if not info.get('required') and info.get('default'):
+                if not value and not info.get('required') and \
+                        info.get('default'):
                     value = info['default']
                 if value or not info.get('required'):
                     if _validate(info.get('validators', ()), value):
