@@ -3,6 +3,7 @@
 $Id$
 """
 
+from base import xim_raw_input
 from base import XimenezPluginTestCase
 
 from ximenez.shared.ssh import SSHRemoteHost
@@ -13,10 +14,20 @@ class SSHRemoteActionTestCase(XimenezPluginTestCase):
     """Test ``actions.ssh.remoteaction``."""
 
     def test_input(self):
-        plugin = getInstance()
         command = 'command'
+
+        ## Manual input
+        plugin = getInstance()
         plugin.getInput(cl_input=command)
         self.failUnless(plugin._input['command'] == command)
+
+        ## User input
+        xim_raw_input.initializeLines((command, ))
+        plugin = getInstance()
+        plugin.getInput()
+        self.failUnless(plugin._input['command'] == command)
+        self.failUnless(xim_raw_input.hasFinished())
+        xim_raw_input.resetLines()
 
 
     def test_execute(self):
