@@ -1,22 +1,11 @@
-"""Tests for ``ximenez.shared`` sub-package.
+"""Tests for ``ximenez.shared.ssh`` module.
 
 $Id$
 """
 
 from base import XimenezTestCase
 
-from ximenez.shared import ssh, zope
-
-
-class ZopeTestCase(XimenezTestCase):
-    """A test case for ``ximenez.shared.zope`` module."""
-
-    def test_getUserDomains(self):
-        pass ## FIXME
-
-
-    def test_getUserRoles(self):
-        pass ## FIXME
+from ximenez.shared import ssh
 
 
 class SSHTestCase(XimenezTestCase):
@@ -59,7 +48,6 @@ class SSHTestCase(XimenezTestCase):
 def test_suite():
     import unittest
     suite = unittest.TestSuite()
-    suite.addTest(unittest.makeSuite(ZopeTestCase))
     suite.addTest(unittest.makeSuite(SSHTestCase))
     return suite
 
