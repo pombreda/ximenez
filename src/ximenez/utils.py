@@ -40,6 +40,8 @@ def getPluginInstance(plugin, kind=None):
     if os.path.exists(plugin):
         module = imp.load_source('plugin', plugin)
     else:
+        if not kind:
+            raise ImportError('Plugin-in kind is missing.')
         module_path = '.'.join(('ximenez', kind, plugin))
         module = __import__(module_path)
         for component in module_path.split('.')[1:]:
