@@ -9,7 +9,11 @@ from ximenez.shared import ssh
 
 
 class SSHTestCase(XimenezTestCase):
-    """A test case for ``ximenez.shared.ssh`` module."""
+    """A test case for ``ximenez.shared.ssh`` module.
+
+    Some of theses tests presume that there is an SSH server listening
+    on port 22 of the local host.
+    """
 
     def test_escapeShellCommand(self):
         commands = ('ls',
