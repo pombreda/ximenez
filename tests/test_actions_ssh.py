@@ -3,11 +3,11 @@
 $Id$
 """
 
-from base import xim_raw_input
 from base import XimenezPluginTestCase
 
 from ximenez.shared.ssh import SSHRemoteHost
 from ximenez.actions.ssh.remoteaction import getInstance
+from ximenez.input import xim_raw_input
 
 
 class SSHRemoteActionTestCase(XimenezPluginTestCase):

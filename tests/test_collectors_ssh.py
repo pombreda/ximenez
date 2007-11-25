@@ -3,10 +3,10 @@
 $Id$
 """
 
-from base import xim_raw_input
 from base import XimenezPluginTestCase
 from base import getCompletePathOfTestFile
 
+from ximenez.input import xim_raw_input
 from ximenez.shared.ssh import SSHRemoteHost
 from ximenez.collectors.ssh import instances
 from ximenez.collectors.ssh import readlines

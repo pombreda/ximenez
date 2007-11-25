@@ -10,9 +10,7 @@ import unittest
 from fakeinput import FakeInput
 import ximenez.input
 ximenez.input.xim_raw_input = FakeInput()
-import ximenez
 ximenez.input.xim_getpass = ximenez.input.xim_raw_input
-from ximenez.input import xim_raw_input
 
 
 ## Monkey-patch ``logging`` so that we can test what is logged.
@@ -23,7 +21,7 @@ from ximenez.xim import LOGGING_LEVEL
 logging.basicConfig(level=LOGGING_LEVEL)
 
 def _log(self, level, msg, args, exc_info=None):
-    """My own log() method"""
+    """Store ``msg`` in a stack."""
     stack = self.getStack()
     stack.append(msg % args)
     ## FIXME: this is a bit basic, for now:

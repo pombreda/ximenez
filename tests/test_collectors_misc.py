@@ -3,10 +3,10 @@
 $Id$
 """
 
-from base import xim_raw_input
 from base import XimenezPluginTestCase
 from base import getCompletePathOfTestFile
 
+from ximenez.input import xim_raw_input
 from ximenez.collectors.misc.readlines import getInstance
 
 
