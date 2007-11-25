@@ -28,8 +28,10 @@ from xmlrpclib import Fault
 from xmlrpclib import ServerProxy
 
 ROLES_REGEXP = re.compile('''<OPTION VALUE="(?:(.*))"(?:(.*))>''')
-DOMAINS_REGEXP = re.compile('''<INPUT TYPE="TEXT" NAME="domains:tokens" SIZE="30"
-  VALUE="(.*?)"''')
+DOMAINS_REGEXP = re.compile('''<INPUT TYPE="TEXT" '''\
+                            '''NAME="domains:tokens" '''\
+                            '''SIZE="30"(?:\n|\r\n|\r)'''\
+                            '''  VALUE="(.*?)"''')
 
 
 class ZopeInstance(object):
@@ -78,24 +80,6 @@ class ZopeInstance(object):
         return getattr(server, method)(*args)
 
 
-    def removeUser(self, userid, manager, manager_pwd):
-        """Remove ``userid``."""
-        if self.usesPAS(manager, manager_pwd):
-            path = 'acl_users/users'
-            method = 'manage_removeUsers'
-            args = ((userid, ), None)
-        else:
-            path = 'acl_users'
-            method = 'userFolderDelUsers'
-            args = ((userid, ), )
-
-        ## FIXME: catch exception when the user does not exist and
-        ## raise our own exception that will be caught in the plug-in.
-        ## With PAS, we get this:
-        ## KeyError, Invalid user ID: <userid>
-        self.performCall(manager, manager_pwd, path, method, args)
-
-
     def addUser(self, userid, pwd, manager, manager_pwd):
         """Add ``userid``."""
         pas = self.usesPAS(manager, manager_pwd)
@@ -133,11 +117,32 @@ class ZopeInstance(object):
         else:
             path = 'acl_users'
             method = 'userFolderEditUser'
+            ## FIXME: call 'downloadUserEditForm()' and then pass over
+            ## the result to 'getUser{Roles,Domains}()'. This will
+            ## save one HTTP call.
             roles = self.getUserRoles(userid,
                                       manager, manager_pwd)
             domains = self.getUserDomains(userid,
                                           manager, manager_pwd)
             args = (userid, password, roles, domains)
+
+        ## FIXME: catch exception when the user does not exist and
+        ## raise our own exception that will be caught in the plug-in.
+        ## With PAS, we get this:
+        ## KeyError, Invalid user ID: <userid>
+        self.performCall(manager, manager_pwd, path, method, args)
+
+
+    def removeUser(self, userid, manager, manager_pwd):
+        """Remove ``userid``."""
+        if self.usesPAS(manager, manager_pwd):
+            path = 'acl_users/users'
+            method = 'manage_removeUsers'
+            args = ((userid, ), None)
+        else:
+            path = 'acl_users'
+            method = 'userFolderDelUsers'
+            args = ((userid, ), )
 
         ## FIXME: catch exception when the user does not exist and
         ## raise our own exception that will be caught in the plug-in.
@@ -154,8 +159,8 @@ class ZopeInstance(object):
         """
         auth_handler = urllib2.HTTPBasicAuthHandler()
         auth_handler.add_password('Zope',
-                                  '%s:%s' % (self.host,
-                                             self.port),
+                                  'http://%s:%s' % (self.host,
+                                                    self.port),
                                   manager, manager_pwd)
         opener = urllib2.build_opener(auth_handler)
         url = 'http://%s:%s/acl_users/manage_users' % (self.host,
@@ -167,28 +172,34 @@ class ZopeInstance(object):
 
 
     def getUserRoles(self, userid,
-                     manager, manager_pwd):
+                     manager, manager_pwd, html=None):
         """Return roles of ``userid``.
 
         **Warning:** this only works for standard user folder, not
         PAS.
         """
-        html = self.downloadUserEditForm(userid,
-                                         manager, manager_pwd)
+        if html is None:
+            html = self.downloadUserEditForm(userid,
+                                             manager, manager_pwd)
         found = ROLES_REGEXP.findall(html)
         roles = [r for (r, selected) in found if selected]
         return roles
 
 
-    def getUserDomains(self, userid, manager, manager_pwd):
+    def getUserDomains(self, userid, manager, manager_pwd, html=None):
         """Return domains of ``userid``.
+
+        If ``html`` is not None, then we use it instead of trying to
+        download the edit form.
 
         **Warning:** this only works for standard user folder, not
         PAS.
         """
-        html = self.downloadUserEditForm(userid,
-                                         manager, manager_pwd)
+        if html is None:
+            html = self.downloadUserEditForm(userid,
+                                             manager, manager_pwd)
         found = DOMAINS_REGEXP.search(html)
-        domains = found.groups()[0].split(' ')
+        domains = found.groups()[0].strip()
+        domains = domains.split(' ')
         domains = [d.strip() for d in domains]
         return domains
