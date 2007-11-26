@@ -16,7 +16,7 @@
 ## along with this program.  If not, see
 ## <http://www.gnu.org/licenses/>.
 
-"""Define ``Print``, a plug-in which simply logs items of a given
+"""Define ``Log``, a plug-in which simply logs items of a given
 sequence.
 
 $Id$
@@ -28,11 +28,11 @@ from ximenez.actions.action import Action
 
 
 def getInstance():
-    """Return an instance of ``Print``."""
-    return Print()
+    """Return an instance of ``Log``."""
+    return Log()
 
 
-class Print(Action):
+class Log(Action):
     """A very simple action, which logs each item returned by the
     collector.
     """
