@@ -26,12 +26,23 @@ import logging
 import urllib2
 from xmlrpclib import Fault
 from xmlrpclib import ServerProxy
+from xmlrpclib import ProtocolError
+
 
 ROLES_REGEXP = re.compile('''<OPTION VALUE="(?:(.*))"(?:(.*))>''')
 DOMAINS_REGEXP = re.compile('''<INPUT TYPE="TEXT" '''\
                             '''NAME="domains:tokens" '''\
                             '''SIZE="30"(?:\n|\r\n|\r)'''\
                             '''  VALUE="(.*?)"''')
+
+class UnauthorizedException(Exception):
+    """User has not been authorized to do that."""
+
+class UserAlreadyExistException(Exception):
+    """User already exists."""
+
+class UserDoNoExistException(Exception):
+    """User does not exist."""
 
 
 class ZopeInstance(object):
@@ -52,36 +63,58 @@ class ZopeInstance(object):
         We do that by trying an XML-RPC request on a method which the
         standard user folder does not implemente, whereas PAS does.
         """
-        server = ServerProxy('http://%s:%s@%s:%s/acl_users' % (manager,
-                                                               manager_pwd,
-                                                               self.host,
-                                                               self.port))
         try:
-            server.searchPrincipals()
+            self.performCall(manager, manager_pwd,
+                             'acl_users', 'searchPrincipals')
         except Fault, exc:
-            if 'NotFound' in str(exc):
+            not_found = 'Unexpected Zope exception: zExceptions.NotFound'
+            if exc.faultString.startswith(not_found):
                 return False
-            logging.error('Could not guess whether the server uses '\
-                          'PAS or not, because of an unexpected '\
-                          'XML-RPC error:', exc_info=True)
+            raise ## Re-raise original exception
 
         ## No error. That means the server does use PAS.
         return True
 
 
-    def performCall(self, manager, manager_pwd, path, method, args):
-        """Perform XML-RPC call on the current Zope instance."""
-        server = ServerProxy('http://%s:%s@%s:%s/%s' % (manager,
-                                                        manager_pwd,
-                                                        self.host,
-                                                        self.port,
-                                                        path),
-                             allow_none=True)
-        return getattr(server, method)(*args)
+    def performCall(self, manager, manager_pwd, path, method, args=()):
+        """Perform XML-RPC on the current Zope instance.
+
+        This method might raise various exceptions, notably
+        ``ProtocolError`` and ``Fault`` (both from ``xmlrpclib``), and
+        also ``UnauthorizedException`` (which is actually a
+        ``ProtocolError`` exception with a specific message, which we
+        are able to detect).
+        """
+        url = 'http://%s:%s@%s:%s/%s' % (manager,
+                                         manager_pwd,
+                                         self.host,
+                                         self.port,
+                                         path)
+        server = ServerProxy(url, allow_none=True)
+        try:
+            result = getattr(server, method)(*args)
+        except ProtocolError, exc:
+            if exc.errmsg == 'Unauthorized':
+                raise UnauthorizedException()
+            raise ## Re-raise original exception
+        return result
 
 
     def addUser(self, userid, pwd, manager, manager_pwd):
-        """Add ``userid``."""
+        """Add ``userid``.
+
+        This method may raise the following exceptions:
+
+        - ``UnauthorizedException``;
+
+        - ``UserAlreadyExistException``.
+
+        Note that standard (non-PAS) user folder do **not** raise any
+        exception when we try to add an user that already exists.
+        Therefore, with this kind of user folder, this method actually
+        **replaces** the user if it already exists, or add it
+        otherwise.
+        """
         pas = self.usesPAS(manager, manager_pwd)
 
         if pas:
@@ -93,14 +126,17 @@ class ZopeInstance(object):
             method = 'userFolderAddUser'
             args = (userid, pwd, ['Manager'], [])
 
-        ## FIXME: catch exception when the user already exists and
-        ## raise our own exception that will be caught in the plug-in.
-        ## With PAS, we get this:
-        ## KeyError: 'Duplicate user ID: <userid>'
-        self.performCall(manager, manager_pwd, path, method, args)
+        try:
+            self.performCall(manager, manager_pwd, path, method, args)
+        except Fault, exc:
+            error = exc.faultString
+            if error.find("'Duplicate user ID: %s'" % userid):
+                raise UserAlreadyExistException()
+            raise ## Re-raise original exception
 
         if pas:
-            # For PAS we must give the role manually
+            ## With a PAS user folder, we must give the role in a
+            ## second step.
             path = 'acl_users/roles'
             method = 'assignRoleToPrincipal'
             args = ('Manager', userid,)
@@ -109,7 +145,14 @@ class ZopeInstance(object):
 
     def modifyUserPassword(self, userid, password,
                            manager, manager_pwd):
-        """Set password of ``userid`` as ``password``."""
+        """Set password of ``userid`` as ``password``.
+
+        This method may raise the following exceptions:
+
+        - ``UnauthorizedException``;
+
+        - ``UserDoNoExistException``.
+        """
         if self.usesPAS(manager, manager_pwd):
             path = 'acl_users/users'
             method = 'manage_updateUserPassword'
@@ -117,24 +160,32 @@ class ZopeInstance(object):
         else:
             path = 'acl_users'
             method = 'userFolderEditUser'
-            ## FIXME: call 'downloadUserEditForm()' and then pass over
-            ## the result to 'getUser{Roles,Domains}()'. This will
-            ## save one HTTP call.
-            roles = self.getUserRoles(userid,
-                                      manager, manager_pwd)
-            domains = self.getUserDomains(userid,
-                                          manager, manager_pwd)
+            edit_form = self.downloadUserEditForm(userid,
+                                                  manager,
+                                                  manager_pwd)
+
+            roles = self.getUserRoles('', '', '', edit_form)
+            domains = self.getUserDomains('', '', '', edit_form)
             args = (userid, password, roles, domains)
 
-        ## FIXME: catch exception when the user does not exist and
-        ## raise our own exception that will be caught in the plug-in.
-        ## With PAS, we get this:
-        ## KeyError, Invalid user ID: <userid>
-        self.performCall(manager, manager_pwd, path, method, args)
+        try:
+            self.performCall(manager, manager_pwd, path, method, args)
+        except Fault, exc:
+            error = exc.faultString
+            if error.find("'Invalid user ID: %s'" % userid):
+                raise UserDoNoExistException()
+            raise ## Re-raise original exception
 
 
     def removeUser(self, userid, manager, manager_pwd):
-        """Remove ``userid``."""
+        """Remove ``userid``.
+
+        This method may raise the following exceptions:
+
+        - ``UnauthorizedException``;
+
+        - ``UserDoNoExistException``.
+        """
         if self.usesPAS(manager, manager_pwd):
             path = 'acl_users/users'
             method = 'manage_removeUsers'
@@ -144,11 +195,15 @@ class ZopeInstance(object):
             method = 'userFolderDelUsers'
             args = ((userid, ), )
 
-        ## FIXME: catch exception when the user does not exist and
-        ## raise our own exception that will be caught in the plug-in.
-        ## With PAS, we get this:
-        ## KeyError, Invalid user ID: <userid>
-        self.performCall(manager, manager_pwd, path, method, args)
+        try:
+            self.performCall(manager, manager_pwd, path, method, args)
+        except Fault, exc:
+            error = exc.faultString
+            if error.endswith("exceptions.KeyError - '%s'" % userid):
+                raise UserDoNoExistException()
+            if error.find("'Invalid user ID: %s'" % userid):
+                raise UserDoNoExistException()
+            raise ## Re-raise original exception
 
 
     def downloadUserEditForm(self, userid, manager, manager_pwd):
@@ -165,7 +220,16 @@ class ZopeInstance(object):
         opener = urllib2.build_opener(auth_handler)
         url = 'http://%s:%s/acl_users/manage_users' % (self.host,
                                                        self.port)
-        page = opener.open(url, data='name=%s&submit=Edit' % userid)
+        try:
+            page = opener.open(url, data='name=%s&submit=Edit' % userid)
+        except urllib2.HTTPError, exc:
+            if exc.msg == 'Unauthorized':
+                raise UnauthorizedException()
+            if exc.msg == 'Internal Server Error' and \
+                    exc.hdrs.get('bobo-exception-type') == 'AttributeError':
+                raise UserDoNoExistException()
+            raise ## Re-raise original exception
+
         html = page.read()
         page.close()
         return html
@@ -199,7 +263,7 @@ class ZopeInstance(object):
             html = self.downloadUserEditForm(userid,
                                              manager, manager_pwd)
         found = DOMAINS_REGEXP.search(html)
-        domains = found.groups()[0].strip()
+        domains = found.groups()[0]
         domains = domains.split(' ')
-        domains = [d.strip() for d in domains]
+        domains = [d for d in domains if d]
         return domains

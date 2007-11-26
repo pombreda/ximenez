@@ -11,9 +11,10 @@ from ximenez.shared import zope
 
 MANAGER = 'ximenez'
 PASSWORD = 'ximenez'
-DOMAINS = ['localhost', '123.123.123.123'] ## Only used for non-PAS
-                                           ## user folders
+## ``DOMAINS`` and ``ROLES`` are only used for non-PAS user folders
+DOMAINS = ['localhost', '123.123.123.123']
 ROLES = ['Manager']
+DUMMY_USER = 'ximenez_dummy'
 HOST = 'localhost'
 PORTS_NO_PAS = (8081, )
 PORTS_PAS = (8091, 8101)
@@ -36,7 +37,59 @@ class ZopeTestCase(XimenezTestCase):
 
 
     def test_userManagement(self):
-        pass ## FIXME self.failUnless(False)
+        ## WARNING: this test tries to add, modify and then remove an
+        ## user in all Zope test instances. If this test fails, it
+        ## will probably leave remnants in some user folders.
+        for port in PORTS_NO_PAS + PORTS_PAS:
+            instance = zope.ZopeInstance(HOST, port)
+
+            ## Add user
+            self.failUnlessRaises(zope.UnauthorizedException,
+                                  instance.addUser,
+                                  DUMMY_USER, 'password',
+                                  MANAGER, 'wrong-password')
+            if instance.usesPAS(MANAGER, PASSWORD):
+                ## Standard (non-PAS) user folders do _not_ raise any
+                ## exception when we try to add an user that already
+                ## exists. In this case, it simply replaces it.
+                self.failUnlessRaises(zope.UserAlreadyExistException,
+                                      instance.addUser,
+                                      MANAGER,  'password',
+                                      MANAGER, PASSWORD)
+            instance.addUser(DUMMY_USER, 'password',
+                             MANAGER, PASSWORD)
+            ## We do not test anything, here. If the user was not
+            ## added, we will have an error later, anyway.
+
+            ## Modify user password
+            NEW_PASSWORD = 'new-password'
+            self.failUnlessRaises(zope.UnauthorizedException,
+                                  instance.modifyUserPassword,
+                                  DUMMY_USER, NEW_PASSWORD,
+                                  MANAGER, 'wrong-password')
+            self.failUnlessRaises(zope.UserDoNoExistException,
+                                  instance.modifyUserPassword,
+                                  'nonexistent-user', NEW_PASSWORD,
+                                  MANAGER, PASSWORD)
+            instance.modifyUserPassword(DUMMY_USER, NEW_PASSWORD,
+                                        MANAGER, PASSWORD)
+            ## To test the new password, we try to change our dummy
+            ## users's password with the dummy user itself. If we do
+            ## not get any error, then the password has effectively
+            ## been changed.
+            instance.modifyUserPassword(DUMMY_USER, 'more-secret',
+                                        DUMMY_USER, NEW_PASSWORD)
+
+            ## Remove user
+            self.failUnlessRaises(zope.UnauthorizedException,
+                                  instance.removeUser,
+                                  DUMMY_USER,
+                                  MANAGER, 'wrong-password')
+            instance.removeUser(DUMMY_USER, MANAGER, PASSWORD)
+            self.failUnlessRaises(zope.UserDoNoExistException,
+                                  instance.removeUser,
+                                  DUMMY_USER,
+                                  MANAGER, PASSWORD)
 
 
     def test_downloadUserEditForm(self):
