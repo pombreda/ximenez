@@ -53,7 +53,7 @@ class ZopeInstance(object):
 
 
     def __repr__(self):
-        return ':'.join((self.host, self.port))
+        return ':'.join((self.host, str(self.port)))
 
 
     def usesPAS(self, manager, manager_pwd):
@@ -101,19 +101,13 @@ class ZopeInstance(object):
 
 
     def addUser(self, userid, pwd, manager, manager_pwd):
-        """Add ``userid``.
+        """Add ``userid`` with a ``Manager`` role.
 
         This method may raise the following exceptions:
 
         - ``UnauthorizedException``;
 
         - ``UserAlreadyExistException``.
-
-        Note that standard (non-PAS) user folder do **not** raise any
-        exception when we try to add an user that already exists.
-        Therefore, with this kind of user folder, this method actually
-        **replaces** the user if it already exists, or add it
-        otherwise.
         """
         pas = self.usesPAS(manager, manager_pwd)
 
@@ -125,6 +119,18 @@ class ZopeInstance(object):
             path = 'acl_users'
             method = 'userFolderAddUser'
             args = (userid, pwd, ['Manager'], [])
+
+        if not pas:
+            ## Standard (non-PAS) user folder do **not** raise any
+            ## exception when we try to add an user that already
+            ## exists. It simply replaces the existing user. Since we
+            ## do not want this behaviour, we manually check that
+            ## there is no existing user.
+            try:
+                self.downloadUserEditForm(userid, manager, manager_pwd)
+                raise UserAlreadyExistException
+            except UserDoNoExistException:
+                pass
 
         try:
             self.performCall(manager, manager_pwd, path, method, args)
