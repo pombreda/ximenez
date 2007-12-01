@@ -92,7 +92,11 @@ class ZopeUserAdderTestCase(XimenezPluginTestCase):
                             manager=MANAGER,
                             manager_pwd=PASSWORD)
         plugin.execute(instances)
-        self.failUnlessLogEqual([])
+        expected = []
+        for instance in instances:
+            expected.append('Added "%s" on "%s".' % (DUMMY_USER, instance))
+        self.failUnlessLogEqual(expected)
+        self.clearLog()
 
         ## Check that the user has been added by trying to change its
         ## own password: if no exception is raised, then everything is
@@ -124,11 +128,7 @@ class ZopeUserRemoverTestCase(XimenezPluginTestCase):
         plugin = rmuser.getInstance()
         plugin.getInput()
         for key, value in cl_input_data.items():
-            try:
-                self.failUnlessEqual(plugin._input[key], value)
-            except:
-                print plugin._input
-                raise
+            self.failUnlessEqual(plugin._input[key], value)
         self.failUnless(xim_raw_input.hasFinished())
         xim_raw_input.resetLines()
 
@@ -175,7 +175,12 @@ class ZopeUserRemoverTestCase(XimenezPluginTestCase):
                             manager=MANAGER,
                             manager_pwd=PASSWORD)
         plugin.execute(instances)
-        self.failUnlessLogEqual([])
+        expected = []
+        for instance in instances:
+            expected.append('Removed "%s" on "%s".' % \
+                            (DUMMY_USER, instance))
+        self.failUnlessLogEqual(expected)
+        self.clearLog()
 
         ## Check that the user has been removed by trying to change
         ## its own password.
@@ -259,7 +264,12 @@ class ZopeUserPasswordModifierTestCase(XimenezPluginTestCase):
                             manager=MANAGER,
                             manager_pwd=PASSWORD)
         plugin.execute(instances)
-        self.failUnlessLogEqual([])
+        expected = []
+        for instance in instances:
+            expected.append('Changed password of "%s" on "%s".' %\
+                            (DUMMY_USER, instance))
+        self.failUnlessLogEqual(expected)
+        self.clearLog()
 
         ## Check that the user has been added by trying to change its
         ## own password: if no exception is raised, then everything is
