@@ -35,10 +35,10 @@ from types import StringType
 ## We define wrappers around ``raw_input`` and ``getpass.getpass`` so
 ## that we can fake input in our tests (see ``tests.fakeinput``).
 def xim_raw_input(prompt=None):
-    raw_input(prompt)
+    return raw_input(prompt)
 
-def xim_getpass(prompt=None, stream=None):
-    getpass(prompt, stream)
+def xim_getpass(prompt=None):
+    return getpass(prompt)
 
 
 ## FIXME: would be nice to better format text (e.g. print errors in
