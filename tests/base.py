@@ -5,39 +5,23 @@ $Id$
 
 import os.path
 import unittest
-
-## Monkey-patch ``input`` and ``getpass.getpass``
-from fakeinput import FakeInput
-import ximenez.input
-ximenez.input.xim_raw_input = FakeInput()
-ximenez.input.xim_getpass = ximenez.input.xim_raw_input
-
-
-## Monkey-patch ``logging`` so that we can test what is logged.
 import logging
-from logging import Logger, getLogger
+from logging import getLogger
+
+## Monkey-patch input methods
+from fakeinput import FakeInput
+fake_input = FakeInput()
+import ximenez.input
+ximenez.input.xim_raw_input = fake_input
+ximenez.input.xim_getpass = fake_input
+
+## Monkey-patch logger
+import fakelogger
+fakelogger.patchLogging()
+
+## Set logging settings(as it is set in the program itself)
 from ximenez.xim import LOGGING_LEVEL
-
 logging.basicConfig(level=LOGGING_LEVEL)
-
-def _log(self, level, msg, args, exc_info=None):
-    """Store ``msg`` in a stack."""
-    stack = self.getStack()
-    stack.append(msg % args)
-    ## FIXME: this is a bit basic, for now:
-    ## - what if exc_info is True?
-    ## - do we want to check log records level (severity)?
-
-def getStack(self):
-    if not hasattr(self, '_stack'):
-        clearStack(self)
-    return self._stack
-
-def clearStack(self): self._stack = []
-
-Logger._log = _log
-Logger.getStack = getStack
-Logger.clearStack = clearStack
 
 
 class XimenezTestCase(unittest.TestCase):
@@ -56,7 +40,7 @@ class XimenezTestCase(unittest.TestCase):
 class XimenezPluginTestCase(XimenezTestCase):
     """Base class for Ximenez plug-ins tests."""
 
-    def setInput(self, plugin, *args, **kwargs):
+    def setPluginInput(self, plugin, *args, **kwargs):
         """Set input information (found in ``kwargs``) of
         ``plugin``.
         """

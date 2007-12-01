@@ -33,11 +33,11 @@ class SSHInstancesTestCase(XimenezPluginTestCase):
 
     def test_collect(self):
         plugin = instances.getInstance()
-        self.setInput(plugin,
-                      {'host': 'host1',
-                       'port': '22'},
-                      {'host': 'host2',
-                       'port': '222'})
+        self.setPluginInput(plugin,
+                            {'host': 'host1',
+                             'port': '22'},
+                            {'host': 'host2',
+                             'port': '222'})
         collected = plugin.collect()
         self.failUnless(len(collected) == 2)
         self.failUnless(isinstance(collected[0], SSHRemoteHost))
@@ -68,7 +68,7 @@ class SSHRemoteHostsReadlinesTestCase(XimenezPluginTestCase):
     def test_collect(self):
         plugin = readlines.getInstance()
         path = getCompletePathOfTestFile('hosts.txt')
-        self.setInput(plugin, path=path)
+        self.setPluginInput(plugin, path=path)
         collected = plugin.collect()
         self.failUnless(len(collected) == 2)
         self.failUnless(str(collected[0]) == 'localhost:22')

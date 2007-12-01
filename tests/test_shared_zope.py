@@ -5,26 +5,24 @@ $Id$
 
 from base import XimenezTestCase
 from base import getCompletePathOfTestFile
+from zopetestsbase import MANAGER
+from zopetestsbase import PASSWORD
+from zopetestsbase import DOMAINS
+from zopetestsbase import ROLES
+from zopetestsbase import DUMMY_USER
+from zopetestsbase import HOST
+from zopetestsbase import PORTS_NO_PAS
+from zopetestsbase import PORTS_PAS
 
 from ximenez.shared import zope
 
 
-MANAGER = 'ximenez'
-PASSWORD = 'ximenez'
-## ``DOMAINS`` and ``ROLES`` are only used for non-PAS user folders
-DOMAINS = ['localhost', '123.123.123.123']
-ROLES = ['Manager']
-DUMMY_USER = 'ximenez_dummy'
-HOST = 'localhost'
-PORTS_NO_PAS = (8081, )
-PORTS_PAS = (8091, 8101)
-
 class ZopeTestCase(XimenezTestCase):
     """A test case for ``ximenez.shared.zope`` module.
 
-    Some of these presume that there are Zope servers listening on the
-    local host, with a specific user. See some of the constants
-    defined above.
+    Some of these tests presume that there are Zope servers listening
+    on the local host, with a specific user. See some of the constants
+    defined in the ``zopetestsbase`` module for further details.
     """
 
     def test_usesPAS(self):
@@ -48,14 +46,10 @@ class ZopeTestCase(XimenezTestCase):
                                   instance.addUser,
                                   DUMMY_USER, 'password',
                                   MANAGER, 'wrong-password')
-            if instance.usesPAS(MANAGER, PASSWORD):
-                ## Standard (non-PAS) user folders do _not_ raise any
-                ## exception when we try to add an user that already
-                ## exists. In this case, it simply replaces it.
-                self.failUnlessRaises(zope.UserAlreadyExistException,
-                                      instance.addUser,
-                                      MANAGER,  'password',
-                                      MANAGER, PASSWORD)
+            self.failUnlessRaises(zope.UserAlreadyExistException,
+                                  instance.addUser,
+                                  MANAGER,  'password',
+                                  MANAGER, PASSWORD)
             instance.addUser(DUMMY_USER, 'password',
                              MANAGER, PASSWORD)
             ## We do not test anything, here. If the user was not

@@ -10,7 +10,7 @@ import unittest
 
 test_cases = [path[:-3] for path in os.listdir(os.curdir) \
               if path.startswith('test_') and path.endswith('.py')]
-doctests = ['fakeinput']
+doctests = ['fakeinput', 'fakelogger']
 
 
 def test_suite():

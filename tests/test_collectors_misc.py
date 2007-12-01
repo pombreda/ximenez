@@ -32,7 +32,7 @@ class ReadLinesTestCase(XimenezPluginTestCase):
     def test_collect(self):
         plugin = getInstance()
         path = getCompletePathOfTestFile('lines.txt')
-        self.setInput(plugin, path=path)
+        self.setPluginInput(plugin, path=path)
         collected = plugin.collect()
         self.failUnless(collected == ['first', 'second', 'third'])
 

@@ -35,7 +35,7 @@ class SSHRemoteActionTestCase(XimenezPluginTestCase):
         hosts = (SSHRemoteHost('localhost'),
                  SSHRemoteHost('127.0.0.1'))
         command = 'echo foo'
-        self.setInput(plugin, command=command)
+        self.setPluginInput(plugin, command=command)
         plugin.execute(hosts)
         expected = ['Executing "%s" on "%s":\n'\
                     'foo' % (command, str(hosts[0])),

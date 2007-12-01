@@ -33,11 +33,11 @@ class ZopeInstancesTestCase(XimenezPluginTestCase):
 
     def test_collect(self):
         plugin = instances.getInstance()
-        self.setInput(plugin,
-                      {'host': 'host1',
-                       'port': '8080'},
-                      {'host': 'host2',
-                       'port': '8082'})
+        self.setPluginInput(plugin,
+                            {'host': 'host1',
+                             'port': '8080'},
+                            {'host': 'host2',
+                             'port': '8082'})
         collected = plugin.collect()
         self.failUnless(len(collected) == 2)
         self.failUnless(str(collected[0]) == 'host1:8080')
@@ -66,7 +66,7 @@ class ZopeInstancesReadlinesTestCase(XimenezPluginTestCase):
     def test_collect(self):
         plugin = readlines.getInstance()
         path = getCompletePathOfTestFile('zope-instances.txt')
-        self.setInput(plugin, path=path)
+        self.setPluginInput(plugin, path=path)
         collected = plugin.collect()
         self.failUnless(len(collected) == 3)
         self.failUnless(str(collected[0]) == 'localhost:8081')

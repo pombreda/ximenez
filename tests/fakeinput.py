@@ -1,24 +1,51 @@
-"""Monkey-patch ``raw_input`` and ``getpass.getpass`` so that they can
-be tested against a predefined scenario.
+## Copyright (c) 2007 Damien Baty
+##
+## This file is free software; you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published
+## by the Free Software Foundation; either version 3 of the License,
+## or (at your option) any later version.
+##
+## This file is distributed in the hope that it will be useful, but
+## WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+## General Public License for more details.
+##
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see
+## <http://www.gnu.org/licenses/>.
+
+"""Define ``FakeInput`` class which can be used to monkey-patch
+``raw_input`` and ``getpass.getpass`` so that they can be tested
+against a predefined scenario.
 
 Basic usage
 ===========
 
-Suppose that we want to test this method::
+Suppose that we want to test ``askForUserIdAndPassword`` defined
+below::
 
+    >>> def my_raw_input(prompt=None): raw_input(prompt)
     >>> from getpass import getpass
-    >>> getpass = raw_input ## Only necessary for this doctest.
+    >>> def my_getpass(prompt=None): getpass(prompt)
+    >>>
     >>> def askForUserIdAndPassword():
-    ...     userid = raw_input('User id: ')
-    ...     password = getpass('Password: ')
+    ...     userid = my_raw_input('User id: ')
+    ...     password = my_getpass('Password: ')
     ...     return userid, password
 
-First, we define a sequence of what would be typed by the user. These
+We will first patch our input methods. Note that we cannot directly
+patch ``raw_input``, because it is a Python built-in (that is why we
+had to define a ``my_raw_input`` wrapper above)::
+
+    >>> my_raw_input = FakeInput()
+    >>> my_getpass = my_raw_input
+
+Then we define a sequence of what would be typed by the user. These
 are lines::
 
-    >>> raw_input.initializeLines(('jsmith', 'secret'))
+    >>> my_raw_input.initializeLines(('jsmith', 'secret'))
 
-Then call your method and check that it works as expected::
+Then we call our method and check that it works as expected::
 
     >>> userid, password = askForUserIdAndPassword()
     >>> userid
@@ -33,12 +60,14 @@ Advanced usage
 Checking number of calls
 ------------------------
 
-We can also test that our method does not ask more than it should::
+We can also test that our method does not ask more than it should. If
+it does, our fake input method will raise an exception
+(``FakeInputNoMoreLineException``)::
 
     >>> def askForFirstname():
-    ...     raw_input('Lastname') ## This is a bug that we would like to catch
-    ...     return raw_input('Firstname')
-    >>> raw_input.initializeLines(('Joe', ))
+    ...     my_raw_input('Lastname') ## This is a bug that we want to catch
+    ...     return my_raw_input('Firstname')
+    >>> my_raw_input.initializeLines(('Joe', ))
     >>> firstname, lastname = askForFirstname()
     ... #doctest: +IGNORE_EXCEPTION_DETAIL
     Traceback (most recent call last):
@@ -49,11 +78,11 @@ On the other hand, we would also like to test that our method does not
 ask less that it should::
 
     >>> def getName():
-    ...     return raw_input('Firstname')
-    >>> raw_input.initializeLines(('Joe', 'Smith'))
+    ...     return my_raw_input('Firstname')
+    >>> my_raw_input.initializeLines(('Joe', 'Smith'))
     >>> getName() # doctest: +ELLIPSIS
     '...'
-    >>> raw_input.hasFinished()
+    >>> my_raw_input.hasFinished()
     False
 
 This means that we expected our method to ask more than it had.
@@ -64,21 +93,21 @@ Dealing with exceptions
 
 Suppose that we want our user to input a list of items. When (s)he has
 finished typing, the user would typically press ``^C`` and our program
-would catch this (as a ``KeyboardInterrupt`` exception):
+would catch this (as a ``KeyboardInterrupt`` exception)::
 
     >>> def getItems():
     ...     items = []
     ...     while 1:
     ...         try:
-    ...             items.append(raw_input('Item: '))
+    ...             items.append(my_raw_input('Item: '))
     ...         except KeyboardInterrupt:
     ...             break
     ...     return items
 
-You can fake it, too:
+We can fake it, too:
 
-    >>> raw_input.initializeLines(('first', 'second',
-    ...                            KeyboardInterrupt))
+    >>> my_raw_input.initializeLines(('first', 'second',
+    ...                                KeyboardInterrupt))
     >>> getItems()
     ['first', 'second']
 
@@ -114,22 +143,17 @@ class FakeInput:
 
 
     def hasFinished(self):
- 	return len(self._lines) == 0
+ 	return len(getattr(self, '_lines')) == 0
 
 
     def __call__(self, prompt=None):
-        if not len(self._lines):
+        if not len(getattr(self, '_lines', [])):
             raise FakeInputNoMoreLineException
         line = self._lines.pop()
         if type(line) != StringType:
             if issubclass(line, BaseException):
                 raise line()
         return line
-
-
-raw_input = FakeInput()
-from getpass import getpass
-getpass = raw_input
 
 
 def _test():
