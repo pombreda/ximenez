@@ -79,9 +79,6 @@ class ZopeUserRemover(Action):
         user = self._input['user']
 
         for instance in instances:
-            if not isinstance(instance, ZopeInstance):
-                host, port = instance.split(":")
-                instance = ZopeInstance(host, port)
             try:
                 instance.removeUser(user, manager, manager_pwd)
             except UnauthorizedException:

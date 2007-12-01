@@ -85,9 +85,6 @@ class ZopeUserAdder(Action):
         user_pwd = self._input['user_pwd']
 
         for instance in instances:
-            if not isinstance(instance, ZopeInstance):
-                host, port = instance.split(":")
-                instance = ZopeInstance(host, port)
             try:
                 instance.addUser(user, user_pwd, manager, manager_pwd)
             except UnauthorizedException:
