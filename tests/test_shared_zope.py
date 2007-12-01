@@ -13,8 +13,10 @@ from zopetestsbase import DUMMY_USER
 from zopetestsbase import HOST
 from zopetestsbase import PORTS_NO_PAS
 from zopetestsbase import PORTS_PAS
+from zopetestsbase import PORTS_NO_LISTEN
 
 from ximenez.shared import zope
+from ximenez.shared import ConnectionException
 
 
 class ZopeTestCase(XimenezTestCase):
@@ -26,6 +28,10 @@ class ZopeTestCase(XimenezTestCase):
     """
 
     def test_usesPAS(self):
+        for port in PORTS_NO_LISTEN:
+            instance = zope.ZopeInstance(HOST, port)
+            self.failUnlessRaises(ConnectionException,
+                                  instance.usesPAS, '', '')
         for port in PORTS_PAS:
             instance = zope.ZopeInstance(HOST, port)
             self.failUnless(instance.usesPAS(MANAGER, PASSWORD))
@@ -38,6 +44,16 @@ class ZopeTestCase(XimenezTestCase):
         ## WARNING: this test tries to add, modify and then remove an
         ## user in all Zope test instances. If this test fails, it
         ## will probably leave remnants in some user folders.
+        for port in PORTS_NO_LISTEN:
+            instance = zope.ZopeInstance(HOST, port)
+            self.failUnlessRaises(ConnectionException,
+                                  instance.addUser, '', '', '', '')
+            self.failUnlessRaises(ConnectionException,
+                                  instance.removeUser, '', '', '')
+            self.failUnlessRaises(ConnectionException,
+                                  instance.modifyUserPassword,
+                                  '', '', '', '')
+
         for port in PORTS_NO_PAS + PORTS_PAS:
             instance = zope.ZopeInstance(HOST, port)
 
@@ -87,6 +103,12 @@ class ZopeTestCase(XimenezTestCase):
 
 
     def test_downloadUserEditForm(self):
+        for port in PORTS_NO_LISTEN:
+            instance = zope.ZopeInstance(HOST, port)
+            self.failUnlessRaises(ConnectionException,
+                                  instance.downloadUserEditForm,
+                                  '', '', '')
+
         for port in PORTS_NO_PAS:
             instance = zope.ZopeInstance(HOST, port)
             html = instance.downloadUserEditForm(MANAGER,
@@ -96,6 +118,12 @@ class ZopeTestCase(XimenezTestCase):
 
 
     def test_getUserDomains(self):
+        for port in PORTS_NO_LISTEN:
+            instance = zope.ZopeInstance(HOST, port)
+            self.failUnlessRaises(ConnectionException,
+                                  instance.getUserDomains,
+                                  '', '', '')
+
         for port in PORTS_NO_PAS:
             instance = zope.ZopeInstance(HOST, port)
             domains = instance.getUserDomains(MANAGER,
@@ -109,6 +137,12 @@ class ZopeTestCase(XimenezTestCase):
 
 
     def test_getUserRoles(self):
+        for port in PORTS_NO_LISTEN:
+            instance = zope.ZopeInstance(HOST, port)
+            self.failUnlessRaises(ConnectionException,
+                                  instance.getUserRoles,
+                                  '', '', '')
+
         for port in PORTS_NO_PAS:
             instance = zope.ZopeInstance(HOST, port)
             roles = instance.getUserRoles(MANAGER,

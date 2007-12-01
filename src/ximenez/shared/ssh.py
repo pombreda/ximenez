@@ -23,6 +23,8 @@ $Id$
 
 from popen2 import popen3
 
+from ximenez.shared import ConnectionException
+
 
 DEFAULT_PORT = '22'
 
@@ -53,7 +55,11 @@ class SSHRemoteHost(object):
         command = escapeShellCommand(command)
         cmd = 'ssh -p %s %s %s' % (self.port, host, command)
         stdout, stdin, stderr = popen3(cmd)
-        output = stdout.read() + stderr.read()
+        stdout = stdout.read()
+        stderr = stderr.read()
+        if stderr.startswith('ssh: %s:' % self.host):
+            raise ConnectionException()
+        output = stdout + stderr
         output = output.strip()
         return output
 

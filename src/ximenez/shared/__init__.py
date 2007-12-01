@@ -2,3 +2,6 @@
 
 $Id$
 """
+
+class ConnectionException(Exception):
+    """Could not connect."""

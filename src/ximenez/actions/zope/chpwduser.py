@@ -26,6 +26,7 @@ $Id$
 import logging
 
 from ximenez.actions.action import Action
+from ximenez.shared import ConnectionException
 from ximenez.shared.zope import ZopeInstance
 from ximenez.shared.zope import UnauthorizedException
 from ximenez.shared.zope import UserDoNoExistException
@@ -93,6 +94,9 @@ class ZopeUserPasswordModifier(Action):
                                             manager, manager_pwd)
                 logging.info('Changed password of "%s" on "%s".',
                              user, instance)
+            except ConnectionException:
+                msg = 'Could not connect to "%s".'
+                logging.error(msg, instance)
             except UnauthorizedException:
                 msg = '"%s" is not authorized to change user\'s '\
                     'password on "%s".'

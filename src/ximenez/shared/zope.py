@@ -22,11 +22,13 @@ $Id$
 """
 
 import re
-import logging
+import socket
 import urllib2
 from xmlrpclib import Fault
 from xmlrpclib import ServerProxy
 from xmlrpclib import ProtocolError
+
+from ximenez.shared import ConnectionException
 
 
 ROLES_REGEXP = re.compile('''<OPTION VALUE="(?:(.*))"(?:(.*))>''')
@@ -93,6 +95,8 @@ class ZopeInstance(object):
         server = ServerProxy(url, allow_none=True)
         try:
             result = getattr(server, method)(*args)
+        except socket.error, exc:
+            raise ConnectionException
         except ProtocolError, exc:
             if exc.errmsg == 'Unauthorized':
                 raise UnauthorizedException()
@@ -235,6 +239,9 @@ class ZopeInstance(object):
                     exc.hdrs.get('bobo-exception-type') == 'AttributeError':
                 raise UserDoNoExistException()
             raise ## Re-raise original exception
+        except urllib2.URLError, exc:
+            raise ConnectionException
+
 
         html = page.read()
         page.close()

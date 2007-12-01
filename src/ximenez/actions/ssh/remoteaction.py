@@ -26,6 +26,7 @@ import os
 import logging
 
 from ximenez.actions.action import Action
+from ximenez.shared import ConnectionException
 
 
 def getInstance():
@@ -62,7 +63,10 @@ class SSHRemote(Action):
         command.
         """
         command = self._input['command']
-        for item in sequence:
-            output = item.execute(command)
-            logging.info('Executing "%s" on "%s":%s%s',
-                         command, item, os.linesep, output)
+        for host in sequence:
+            try:
+                output = host.execute(command)
+                logging.info('Executing "%s" on "%s":%s%s',
+                         command, host, os.linesep, output)
+            except ConnectionException:
+                logging.error('Could not connect to "%s".' % host)

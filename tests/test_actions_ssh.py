@@ -33,14 +33,16 @@ class SSHRemoteActionTestCase(XimenezPluginTestCase):
     def test_execute(self):
         plugin = getInstance()
         hosts = (SSHRemoteHost('localhost'),
-                 SSHRemoteHost('127.0.0.1'))
+                 SSHRemoteHost('127.0.0.1'),
+                 SSHRemoteHost('nonexistent'))
         command = 'echo foo'
         self.setPluginInput(plugin, command=command)
         plugin.execute(hosts)
         expected = ['Executing "%s" on "%s":\n'\
                     'foo' % (command, str(hosts[0])),
                     'Executing "%s" on "%s":\n'\
-                    'foo' % (command, str(hosts[1]))]
+                    'foo' % (command, str(hosts[1])),
+                    'Could not connect to "%s".' % hosts[2]]
         self.failUnlessLogEqual(expected)
         self.clearLog()
 

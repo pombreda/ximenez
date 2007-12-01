@@ -10,11 +10,13 @@ from zopetestsbase import DUMMY_USER
 from zopetestsbase import HOST
 from zopetestsbase import PORTS_NO_PAS
 from zopetestsbase import PORTS_PAS
+from zopetestsbase import PORTS_NO_LISTEN
 
 from ximenez.input import xim_raw_input
 from ximenez.actions.zope import adduser
 from ximenez.actions.zope import rmuser
 from ximenez.actions.zope import chpwduser
+from ximenez.shared import ConnectionException
 from ximenez.shared.zope import ZopeInstance
 from ximenez.shared.zope import UnauthorizedException
 from ximenez.shared.zope import UserDoNoExistException
@@ -49,6 +51,24 @@ class ZopeUserAdderTestCase(XimenezPluginTestCase):
 
 
     def test_execute(self):
+        ## Try with a Zope that does not respond
+        instances = []
+        for port in PORTS_NO_LISTEN:
+            instances.append(ZopeInstance(HOST, port))
+        plugin = adduser.getInstance()
+        self.setPluginInput(plugin,
+                            user='user',
+                            user_pwd='',
+                            manager='',
+                            manager_pwd='')
+        plugin.execute(instances)
+        expected = []
+        for instance in instances:
+            expected.append('Could not connect to "%s".' % instance)
+        self.failUnlessLogEqual(expected)
+        self.clearLog()
+
+        ## Setup for next tests
         password = 'password'
         instances = []
         for port in PORTS_NO_PAS + PORTS_PAS:
@@ -134,6 +154,23 @@ class ZopeUserRemoverTestCase(XimenezPluginTestCase):
 
 
     def test_execute(self):
+        ## Try with a Zope that does not respond
+        instances = []
+        for port in PORTS_NO_LISTEN:
+            instances.append(ZopeInstance(HOST, port))
+        plugin = rmuser.getInstance()
+        self.setPluginInput(plugin,
+                            user='user',
+                            manager='',
+                            manager_pwd='')
+        plugin.execute(instances)
+        expected = []
+        for instance in instances:
+            expected.append('Could not connect to "%s".' % instance)
+        self.failUnlessLogEqual(expected)
+        self.clearLog()
+
+        ## Setup for next tests
         instances = []
         for port in PORTS_NO_PAS + PORTS_PAS:
             instances.append(ZopeInstance(HOST, port))
@@ -219,6 +256,24 @@ class ZopeUserPasswordModifierTestCase(XimenezPluginTestCase):
 
 
     def test_execute(self):
+        ## Try with a Zope that does not respond
+        instances = []
+        for port in PORTS_NO_LISTEN:
+            instances.append(ZopeInstance(HOST, port))
+        plugin = chpwduser.getInstance()
+        self.setPluginInput(plugin,
+                            user='user',
+                            user_pwd='',
+                            manager='',
+                            manager_pwd='')
+        plugin.execute(instances)
+        expected = []
+        for instance in instances:
+            expected.append('Could not connect to "%s".' % instance)
+        self.failUnlessLogEqual(expected)
+        self.clearLog()
+
+        ## Setup for next tests
         password = 'password'
         instances = []
         for port in PORTS_NO_PAS + PORTS_PAS:

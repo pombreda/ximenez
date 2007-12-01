@@ -6,6 +6,7 @@ $Id$
 from base import XimenezTestCase
 
 from ximenez.shared import ssh
+from ximenez.shared import ConnectionException
 
 
 class SSHTestCase(XimenezTestCase):
@@ -47,6 +48,10 @@ class SSHTestCase(XimenezTestCase):
         self.failUnlessEqual(host.execute('echo "foo"'), 'foo')
         self.failUnlessEqual(host.execute('ls /doesnotexist'),
                              'ls: /doesnotexist: No such file or directory')
+
+    def test_cannot_connect(self):
+        host = ssh.SSHRemoteHost('nonexistent', 222)
+        self.failUnlessRaises(ConnectionException, host.execute, 'ls')
 
 
 def test_suite():
