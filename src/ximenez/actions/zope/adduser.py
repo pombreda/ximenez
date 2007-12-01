@@ -87,6 +87,7 @@ class ZopeUserAdder(Action):
         for instance in instances:
             try:
                 instance.addUser(user, user_pwd, manager, manager_pwd)
+                logging.info('Added "%s" on "%s".', user, instance)
             except UnauthorizedException:
                 msg = '"%s" is not authorized to add user '\
                     'on "%s".'

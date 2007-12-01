@@ -81,6 +81,7 @@ class ZopeUserRemover(Action):
         for instance in instances:
             try:
                 instance.removeUser(user, manager, manager_pwd)
+                logging.info('Removed "%s" on "%s".', user, instance)
             except UnauthorizedException:
                 msg = '"%s" is not authorized to remove user on "%s".'
                 logging.error(msg, manager, instance)

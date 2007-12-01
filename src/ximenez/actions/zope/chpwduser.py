@@ -91,6 +91,8 @@ class ZopeUserPasswordModifier(Action):
             try:
                 instance.modifyUserPassword(user, user_pwd,
                                             manager, manager_pwd)
+                logging.info('Changed password of "%s" on "%s".',
+                             user, instance)
             except UnauthorizedException:
                 msg = '"%s" is not authorized to change user\'s '\
                     'password on "%s".'
