@@ -26,6 +26,8 @@ import logging
 
 from ximenez.actions.action import Action
 from ximenez.shared.zope import ZopeInstance
+from ximenez.shared.zope import UnauthorizedException
+from ximenez.shared.zope import UserDoNoExistException
 
 
 def getInstance():
@@ -48,7 +50,7 @@ class ZopeUserRemover(Action):
             return
 
         ask = self.askForInput
-        self._input.update(ask(({'name': 'userid',
+        self._input.update(ask(({'name': 'user',
                                  'prompt': 'User id to remove: ',
                                  'required': True
                                  },)
@@ -74,19 +76,21 @@ class ZopeUserRemover(Action):
         """
         manager = self._input['manager']
         manager_pwd = self._input['manager_pwd']
-        userid = self._input['userid']
+        user = self._input['user']
 
         for instance in instances:
             if not isinstance(instance, ZopeInstance):
                 host, port = instance.split(":")
                 instance = ZopeInstance(host, port)
             try:
-                instance.removeUser(userid, manager, manager_pwd)
-                logging.info('Removed "%s" from "%s".',
-                             userid, instance)
-            ## FIXME: try to catch "expected" exceptions, see
-            ## 'shared.zope'
+                instance.removeUser(user, manager, manager_pwd)
+            except UnauthorizedException:
+                msg = '"%s" is not authorized to remove user on "%s".'
+                logging.error(msg, manager, instance)
+            except UserDoNoExistException:
+                msg = '"%s" does not exist on "%s".'
+                logging.error(msg, user, instance)
             except:
                 logging.error('Could not remove "%s" from "%s" '\
                               'because of an unexpected exception.',
-                              userid, instance, exc_info=True)
+                              user, instance, exc_info=True)

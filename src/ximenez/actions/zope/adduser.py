@@ -22,10 +22,12 @@ instances via XML-RPC and tries to create a Manager user.
 $Id$
 """
 
-import logging 
+import logging
 
 from ximenez.actions.action import Action
 from ximenez.shared.zope import ZopeInstance
+from ximenez.shared.zope import UnauthorizedException
+from ximenez.shared.zope import UserAlreadyExistException
 
 
 def getInstance():
@@ -35,7 +37,8 @@ def getInstance():
 
 class ZopeUserAdder(Action):
     """An action which adds an user to a collection of Zope instances
-    via XML-RPC."""
+    via XML-RPC.
+    """
 
     _input_info = ()
 
@@ -47,11 +50,11 @@ class ZopeUserAdder(Action):
             return
 
         ask = self.askForInput
-        self._input.update(ask(({'name': 'userid',
+        self._input.update(ask(({'name': 'user',
                                  'prompt': 'User id to create: ',
                                  'required': True
                                  },
-                                {'name': 'pwd',
+                                {'name': 'user_pwd',
                                  'prompt': 'Password of the new user: ',
                                  'required': True,
                                  'hidden': True
@@ -78,19 +81,23 @@ class ZopeUserAdder(Action):
         """
         manager = self._input['manager']
         manager_pwd = self._input['manager_pwd']
-        userid = self._input['userid']
-        pwd = self._input['pwd']
+        user = self._input['user']
+        user_pwd = self._input['user_pwd']
 
         for instance in instances:
             if not isinstance(instance, ZopeInstance):
                 host, port = instance.split(":")
                 instance = ZopeInstance(host, port)
             try:
-                instance.addUser(userid, pwd, manager, manager_pwd)
-                logging.info('Added "%s" to "%s".', userid, instance)
-            ## FIXME: try to catch "expected" exceptions, see
-            ## 'shared.zope'
+                instance.addUser(user, user_pwd, manager, manager_pwd)
+            except UnauthorizedException:
+                msg = '"%s" is not authorized to add user '\
+                    'on "%s".'
+                logging.error(msg, manager, instance)
+            except UserAlreadyExistException:
+                msg = '"%s" already exists on "%s".'
+                logging.error(msg, user, instance)
             except:
                 logging.error('Could not add "%s" to "%s" '\
-                              'because of an unexpected exception:',
-                              userid, instance, exc_info=True)
+                              'because of an unexpected exception: ',
+                              user, instance, exc_info=True)
