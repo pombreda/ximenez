@@ -19,13 +19,13 @@ class SSHRemoteActionTestCase(XimenezPluginTestCase):
         ## Manual input
         plugin = getInstance()
         plugin.getInput(cl_input=command)
-        self.failUnless(plugin._input['command'] == command)
+        self.failUnlessEqual(plugin._input['command'], command)
 
         ## User input
         xim_raw_input.initializeLines((command, ))
         plugin = getInstance()
         plugin.getInput()
-        self.failUnless(plugin._input['command'] == command)
+        self.failUnlessEqual(plugin._input['command'], command)
         self.failUnless(xim_raw_input.hasFinished())
         xim_raw_input.resetLines()
 

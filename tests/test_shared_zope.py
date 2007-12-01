@@ -92,7 +92,7 @@ class ZopeTestCase(XimenezTestCase):
             html = instance.downloadUserEditForm(MANAGER,
                                                  MANAGER, PASSWORD)
             expected = open(getCompletePathOfTestFile('edit_form.html')).read()
-            self.failUnless(html == expected)
+            self.failUnlessEqual(html, expected)
 
 
     def test_getUserDomains(self):
@@ -100,12 +100,12 @@ class ZopeTestCase(XimenezTestCase):
             instance = zope.ZopeInstance(HOST, port)
             domains = instance.getUserDomains(MANAGER,
                                               MANAGER, PASSWORD)
-            self.failUnless(domains == DOMAINS)
+            self.failUnlessEqual(domains, DOMAINS)
 
             html = getCompletePathOfTestFile('edit_form.html')
             html = open(html).read()
             domains = instance.getUserDomains('', '', '', html)
-            self.failUnless(domains == DOMAINS)
+            self.failUnlessEqual(domains, DOMAINS)
 
 
     def test_getUserRoles(self):
@@ -113,12 +113,12 @@ class ZopeTestCase(XimenezTestCase):
             instance = zope.ZopeInstance(HOST, port)
             roles = instance.getUserRoles(MANAGER,
                                           MANAGER, PASSWORD)
-            self.failUnless(roles == ROLES)
+            self.failUnlessEqual(roles, ROLES)
 
             html = getCompletePathOfTestFile('edit_form.html')
             html = open(html).read()
             roles = instance.getUserRoles('', '', '', html)
-            self.failUnless(roles == ROLES)
+            self.failUnlessEqual(roles, ROLES)
 
 
 def test_suite():

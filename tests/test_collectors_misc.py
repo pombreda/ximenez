@@ -19,12 +19,12 @@ class ReadLinesTestCase(XimenezPluginTestCase):
         ## Manual input
         path = '/path/to/file'
         plugin.getInput(cl_input=path)
-        self.failUnless(plugin._input['path'] == path)
+        self.failUnlessEqual(plugin._input['path'], path)
 
         ## User input
         xim_raw_input.initializeLines((path, ))
         plugin.getInput()
-        self.failUnless(plugin._input['path'] == path)
+        self.failUnlessEqual(plugin._input['path'], path)
         self.failUnless(xim_raw_input.hasFinished())
         xim_raw_input.resetLines()
 
@@ -34,7 +34,7 @@ class ReadLinesTestCase(XimenezPluginTestCase):
         path = getCompletePathOfTestFile('lines.txt')
         self.setPluginInput(plugin, path=path)
         collected = plugin.collect()
-        self.failUnless(collected == ['first', 'second', 'third'])
+        self.failUnlessEqual(collected, ['first', 'second', 'third'])
 
 
 def test_suite():

@@ -26,7 +26,7 @@ class SSHInstancesTestCase(XimenezPluginTestCase):
                                        'host2', '222',
                                        KeyboardInterrupt))
         plugin.getInput()
-        self.failUnless(plugin._input == hosts)
+        self.failUnlessEqual(plugin._input, hosts)
         self.failUnless(xim_raw_input.hasFinished())
         xim_raw_input.resetLines()
 
@@ -39,11 +39,11 @@ class SSHInstancesTestCase(XimenezPluginTestCase):
                             {'host': 'host2',
                              'port': '222'})
         collected = plugin.collect()
-        self.failUnless(len(collected) == 2)
+        self.failUnlessEqual(len(collected), 2)
         self.failUnless(isinstance(collected[0], SSHRemoteHost))
-        self.failUnless(str(collected[0]) == 'host1:22')
+        self.failUnlessEqual(str(collected[0]), 'host1:22')
         self.failUnless(isinstance(collected[1], SSHRemoteHost))
-        self.failUnless(str(collected[1]) == 'host2:222')
+        self.failUnlessEqual(str(collected[1]), 'host2:222')
 
 
 class SSHRemoteHostsReadlinesTestCase(XimenezPluginTestCase):
@@ -55,12 +55,12 @@ class SSHRemoteHostsReadlinesTestCase(XimenezPluginTestCase):
         ## Manual input
         path = '/path/to/file'
         plugin.getInput(cl_input=path)
-        self.failUnless(plugin._input['path'] == path)
+        self.failUnlessEqual(plugin._input['path'], path)
 
         ## User input
         xim_raw_input.initializeLines((path, ))
         plugin.getInput()
-        self.failUnless(plugin._input['path'] == path)
+        self.failUnlessEqual(plugin._input['path'], path)
         self.failUnless(xim_raw_input.hasFinished())
         xim_raw_input.resetLines()
 
@@ -70,9 +70,11 @@ class SSHRemoteHostsReadlinesTestCase(XimenezPluginTestCase):
         path = getCompletePathOfTestFile('hosts.txt')
         self.setPluginInput(plugin, path=path)
         collected = plugin.collect()
-        self.failUnless(len(collected) == 2)
-        self.failUnless(str(collected[0]) == 'localhost:22')
-        self.failUnless(str(collected[1]) == '127.0.0.1:22')
+        self.failUnlessEqual(len(collected), 2)
+        self.failUnless(isinstance(collected[0], SSHRemoteHost))
+        self.failUnlessEqual(str(collected[0]), 'localhost:22')
+        self.failUnless(isinstance(collected[1], SSHRemoteHost))
+        self.failUnlessEqual(str(collected[1]), '127.0.0.1:22')
 
 
 def test_suite():

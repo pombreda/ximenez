@@ -7,6 +7,7 @@ from base import XimenezPluginTestCase
 from base import getCompletePathOfTestFile
 
 from ximenez.input import xim_raw_input
+from ximenez.shared.zope import ZopeInstance
 from ximenez.collectors.zope import instances
 from ximenez.collectors.zope import readlines
 
@@ -26,7 +27,7 @@ class ZopeInstancesTestCase(XimenezPluginTestCase):
                                        'host2', '8082',
                                        KeyboardInterrupt))
         plugin.getInput()
-        self.failUnless(plugin._input == hosts)
+        self.failUnlessEqual(plugin._input, hosts)
         self.failUnless(xim_raw_input.hasFinished())
         xim_raw_input.resetLines()
 
@@ -39,9 +40,11 @@ class ZopeInstancesTestCase(XimenezPluginTestCase):
                             {'host': 'host2',
                              'port': '8082'})
         collected = plugin.collect()
-        self.failUnless(len(collected) == 2)
-        self.failUnless(str(collected[0]) == 'host1:8080')
-        self.failUnless(str(collected[1]) == 'host2:8082')
+        self.failUnlessEqual(len(collected), 2)
+        self.failUnless(isinstance(collected[0], ZopeInstance))
+        self.failUnlessEqual(str(collected[0]), 'host1:8080')
+        self.failUnless(isinstance(collected[1], ZopeInstance))
+        self.failUnlessEqual(str(collected[1]), 'host2:8082')
 
 
 class ZopeInstancesReadlinesTestCase(XimenezPluginTestCase):
@@ -58,7 +61,7 @@ class ZopeInstancesReadlinesTestCase(XimenezPluginTestCase):
         ## User input
         xim_raw_input.initializeLines((path, ))
         plugin.getInput()
-        self.failUnless(plugin._input['path'] == path)
+        self.failUnlessEqual(plugin._input['path'], path)
         self.failUnless(xim_raw_input.hasFinished())
         xim_raw_input.resetLines()
 
@@ -68,10 +71,13 @@ class ZopeInstancesReadlinesTestCase(XimenezPluginTestCase):
         path = getCompletePathOfTestFile('zope-instances.txt')
         self.setPluginInput(plugin, path=path)
         collected = plugin.collect()
-        self.failUnless(len(collected) == 3)
-        self.failUnless(str(collected[0]) == 'localhost:8081')
-        self.failUnless(str(collected[1]) == 'localhost:8091')
-        self.failUnless(str(collected[2]) == 'localhost:8101')
+        self.failUnlessEqual(len(collected), 3)
+        self.failUnless(isinstance(collected[0], ZopeInstance))
+        self.failUnlessEqual(str(collected[0]), 'localhost:8081')
+        self.failUnless(isinstance(collected[1], ZopeInstance))
+        self.failUnlessEqual(str(collected[1]), 'localhost:8091')
+        self.failUnless(isinstance(collected[2], ZopeInstance))
+        self.failUnlessEqual(str(collected[2]), 'localhost:8101')
 
 
 def test_suite():
