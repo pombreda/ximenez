@@ -15,8 +15,8 @@ Miscellaneous
   Displays Ximenez version number and exits.
 
 
-Plug-ins
----------
+Collector plug-in
+-----------------
 
 ``-c <collector>``
   Use ``<collector>`` as the collector plug-in. ``<collector>`` can be
@@ -29,13 +29,13 @@ Plug-ins
   ``<input>`` depends on the plug-in.
 
 
-Action
-------
+Action plug-in
+--------------
 
 ``-a <action>``
   Use ``<action>`` as the action plug-in. ``<collector>`` can be the
   path of a Python module (e.g. ``/tmp/myaction.py``) or the dotted
-  name of a built-in plug-in (e.g. ``misc.print``).
+  name of a built-in plug-in (e.g. ``misc.log``).
 
 
 ``--ai <input>``

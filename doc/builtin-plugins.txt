@@ -1,3 +1,4 @@
+=========================
 Ximenez built-in plug-ins
 =========================
 
@@ -5,55 +6,78 @@ The main characteristic of Ximenez is that it can be extended to just
 do what you need to do, by using plug-ins. There are two kinds of
 plug-ins: collectors and actions.
 
-Ximenez ships with a set of built-in plug-ins. They are desribed below.
+Ximenez ships with a set of built-in plug-ins. They are described
+below.
 
 
 Collectors
-----------
+==========
 
 Built-in collectors are:
 
+Miscellaneous
+-------------
+
 ``misc.readlines``
-  Collect values from a file (the values are the content of each
+  Collects values from a file (the values are the content of each
   line).
 
+
+SSH
+---
+
 ``ssh.readlines``
-  Collect a set of remote hosts from a file. Each line of the file
+  Collects a set of remote hosts from a file. Each line of the file
   should be of the form ``<host>[:<ssh-port>]``).
 
+
+Zope
+----
+
 ``zope.readlines``
-  Collect a set of Zope instances from a file. Each line of the file
-  should be of the form ``<host>[:<http-port>]``).
+  Collects a set of Zope instances from a file. Each line of the file
+  should be of the form ``<host>:<http-port>``).
 
 ``zope.instances``
-  Collect a set of Zope servers from an user's input.
+  Collects a set of Zope servers from an user's input.
 
 
 Actions
--------
+=======
 
 Built-in actions are:
 
-``misc.print``
+Miscellaneous
+-------------
+
+``misc.log``
   Logs (prints) each collected item. It can be quite useful when you
   are debugging a collector.
 
+
+SSH
+---
+
 ``ssh.remoteaction``
-  Execute a command on the collected set of remote hosts (via SSH) and
-  return its output.
+  Executes a command on the collected set of remote hosts (via SSH)
+  and returns its output.
+
+
+Zope
+----
 
 ``zope.adduser``
-  Add a new user in the collected set of Zope instances.
+  Adds a new user in the collected set of Zope instances.
 
 ``zope.chpwduser``
-  Change password of an user in the collected set of Zope instances.
+  Changes an user's password in the collected set of Zope instances.
 
 ``zope.rmuser``
-  Remove an user in the collected set of Zope instances.
+  Removes an user in the collected set of Zope instances.
 
 
 Developing your own plug-ins
-----------------------------
+============================
 
 There is an `exhaustive guide`_ to develop your own plug-ins.
 

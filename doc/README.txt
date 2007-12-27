@@ -1,4 +1,4 @@
-.. --*- coding: utf-8 -*-
+.. -*- coding: utf-8 -*-
 
 Ximenez : a multi-purpose action performer
 ==========================================
@@ -20,16 +20,6 @@ See the `Plug-ins`_ section below to know more about Ximenez built-in
 plug-ins and how to develop your own ones.
 
 
-.. warning::
-
-    Ximenez is already used in production. However, some action
-    plug-ins have known bugs. For example, Zope-related action
-    plug-ins fail in certain cases. If you encounter bugs, make sure
-    that you are using the trunk (see `Subversion repository`_ section
-    below) and contact the author: someone might very well be working
-    on a fix.
-
-
 Usage
 -----
 
@@ -43,7 +33,7 @@ to perform on each item of this set.
 
 Hopefully, Ximenez comes with a number of useful plug-ins , e.g.::
 
-    $ ximenez -c misc.readlines -a misc.print
+    $ ximenez -c misc.readlines -a misc.log
 
 Optional arguments are available. See `usage`_ for further
 details.
@@ -59,7 +49,7 @@ do what you need to do, by using plug-ins. There are two kinds of
 plug-ins: collectors and actions.
 
 Ximenez ships with a set of `built-in plug-ins`_. You may also want to
-take a loo at the `exhaustive guide`_ to develop your own plug-ins.
+take a look at the `exhaustive guide`_ to develop your own plug-ins.
 
 .. _built-in plug-ins: builtin-plugins.txt
 .. _exhaustive guide: develop-plugins.txt
@@ -71,8 +61,8 @@ Requirements
 Ximenez should run under any OS, though some plug-ins may use
 OS-specific features or require special Python packages.
 
-Python 2.3 or above is required. This program may also work with prior
-versions of Python, though it has not been tested.
+Python 2.4 or above is required. This program may also work with prior
+versions of Python with minor changes.
 
 
 Installation
@@ -80,9 +70,9 @@ Installation
 
 If you have ``easy_install``, then the following should do the trick::
 
-    $ easy_install Ximenez
+    $ easy_install ximenez
 
-For further details, see the `Installation`_ chapter
+For further details, see the `Installation`_ chapter.
 
 .. _Installation: install.txt
 
@@ -93,11 +83,18 @@ Subversion repository
 Ximenez source code lives in a Subversion repository. To checkout the
 trunk::
 
-    $ svn co https://svn.pilotsystems.net/projets/ximenez/trunk
+    $ svn co https://svn.pilotsystems.net/projets/ximenez/trunk ximenez
 
 You can also `browse the sources`_ with the same URL.
 
 .. _`browse the sources`: https://svn.pilotsystems.net/projets/ximenez
+
+
+The name
+--------
+
+It all began in Jarrow. One of the cross beams had gone out askew on
+the treddle. And, well, that's all, I guess.
 
 
 Credits
@@ -117,7 +114,7 @@ program.
 License
 -------
 
-Ximenez is copyright 2008 by Damien Baty.
+Ximenez is copyright 2006-2007 by Damien Baty.
 
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by

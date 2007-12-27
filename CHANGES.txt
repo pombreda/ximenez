@@ -1,8 +1,28 @@
 List of changes in Ximenez versions
 ===================================
 
-What's new in Ximenez 0.8
--------------------------
+What's new in Ximenez 0.9 (revision FIXME)
+------------------------------------------
+
+- usual errors are now caught by the Zope-related plug-ins. They now
+  log meaningful messages in most cases;
+
+- behaviour of the "add user" Zope plug-in has changed for non-PAS
+  user folders. Before, this plug-in could replace an existing user
+  (this is a feature/bug of the Zope user folder). It now raises an
+  exception when we try to add an user that already exists;
+
+- mock objects (fake logger and fake input) have been moved to their
+  own modules, making them reusable. They also have their own
+  doctests;
+
+- tests coverage is near 100%;
+
+- documentation has been updated.
+
+
+What's new in Ximenez 0.8 (unreleased)
+--------------------------------------
 
 - added a set of tests. Still incomplete, but ready to be written. ;)
 
@@ -14,8 +34,8 @@ What's new in Ximenez 0.8
   and actions classes names.
 
 
-What's new in Ximenez 0.7
--------------------------
+What's new in Ximenez 0.7 (unreleased)
+--------------------------------------
 
 - made changes to the code so that Ximenez can be installed (and not
   only used from the source directory);
@@ -23,7 +43,7 @@ What's new in Ximenez 0.7
 - arranged and augmented documentation.
 
 
-What's new in Ximenez 0.6
--------------------------
+What's new in Ximenez 0.6 (unreleased)
+--------------------------------------
 
 - added logging-related features.

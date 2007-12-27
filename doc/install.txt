@@ -43,8 +43,8 @@ Install "the old way"
 If you do not want to use ``easy_install``, you can use the
 "traditional" method:
 
-1. Download sources (either from the `tarball`_ or from the `SVN
-   repository`_).
+1. Download sources (either from the `latest tarball`_ or from the
+   `SVN repository`_).
 
 2. Run::
 
@@ -54,8 +54,8 @@ If you do not want to use ``easy_install``, you can use the
 
     $ python setup.py install
 
-.. _`tarball`: /ximenez/files/ximenez-latest.tar.gz
-.. _`SVN repository`: https://svn.noherring.com/code/ximenez
+.. _`latest tarball`: /ximenez/files/ximenez-latest.tar.gz
+.. _`SVN repository`: https://svn.pilotsystems.net/projets/ximenez/trunk
 
 
 Test your installation
