@@ -59,19 +59,23 @@ class ZopeInstance(object):
 
 
     def usesPAS(self, manager, manager_pwd):
-        """Return ``True`` iff the server uses PAS (Pluggable Authentication
-        Service) as its user folder (and not a standard user folder).
+        """Tells whether the server uses PAS (Pluggable Authentication
+        Service) or a standard user folder.
 
         We do that by trying an XML-RPC request on a method which the
-        standard user folder does not implemente, whereas PAS does.
+        standard user folder does not implement, whereas PAS does.
         """
         try:
             self.performCall(manager, manager_pwd,
                              'acl_users', 'searchPrincipals')
         except Fault, exc:
-            not_found = 'Unexpected Zope exception: zExceptions.NotFound'
-            if exc.faultString.startswith(not_found):
+            if 'NotFound' in exc.faultString:
                 return False
+            not_found_zope_2_5 = 'Cannot locate object at: '\
+                'http://%s:%s/acl_users/searchPrincipals' % \
+                (self.host, self.port)
+            if not_found_zope_2_5 in exc.faultString:
+                return False ## Zope 2.5 compatibility
             raise ## Re-raise original exception
 
         ## No error. That means the server does use PAS.
@@ -100,6 +104,7 @@ class ZopeInstance(object):
         except ProtocolError, exc:
             if exc.errmsg == 'Unauthorized':
                 raise UnauthorizedException()
+            exc.url = exc.url.replace(manager_pwd, '########')
             raise ## Re-raise original exception
         return result
 
@@ -167,6 +172,9 @@ class ZopeInstance(object):
             path = 'acl_users/users'
             method = 'manage_updateUserPassword'
             args = (userid, password, password, None)
+            ## FIXME: PAS 1.2 & 1.3 require an additional 'login_name'
+            ## argument (which would be equal to 'userid', in this use
+            ## case).
         else:
             path = 'acl_users'
             method = 'userFolderEditUser'
