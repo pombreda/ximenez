@@ -25,8 +25,8 @@ try:
     import readline
 except ImportError:
     pass ## No support for 'readline'.
-    ## FIXME: auto-completion features will not work. We have to take
-    ## care of this.
+    ## FIXME: auto-completion features will not work. Do we have to
+    ## take care of this?
 import logging
 from getpass import getpass
 from types import StringType
@@ -110,13 +110,9 @@ class InputAware:
           is ``False``;
 
         - ``validators`` is an optional sequence of validators. Each
-          validator may be either a string (which should be method of
-          the plug-in) or a callable (a function, a lambda expression,
-          etc.)
-
-        FIXME: we may want to add an optional key (``constraint``)
-        which is a function (or a string that would be evaluated)
-        which would be used to check the user input.
+          validator may be either a string (which should be a method
+          of the object calling ``getInput()``) or a callable (a
+          function, a lambda expression, etc.)
 
         FIXME: we could also have a 'vocabulary' key which would:
         - enforce the value to be in a restricted set of values
