@@ -1,5 +1,6 @@
 import os
-from setuptools import setup, find_packages
+from setuptools import setup
+from setuptools import find_packages
 
 
 version_file = 'VERSION.txt'
@@ -28,8 +29,15 @@ setup(
     description=description,
     long_description=long_description,
     license='GNU GPL',
-    classifiers=(), ## FIXME
-    keywords='FIXME',
-    url='', ##FIXME
-    download_url='', ## FIXME
+    classifiers=('Development Status :: 4 - Beta',
+                 'Intended Audience :: Developers',
+                 'Intended Audience :: System Administrators',
+                 'License :: OSI Approved :: GNU General Public License (GPL)',
+                 'Operating System :: OS Independent',
+                 'Programming Language :: Python',
+                 'Topic :: System',
+                 'Topic :: Utilities'),
+    keywords='collector action plug-in plugin',
+    url='http://code.noherring.com/ximenez',
+    download_url='http://cheeseshop.python.org/pypi/ximenez',
     )

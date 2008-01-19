@@ -1,14 +1,10 @@
-- write more tests
-
-- remove 'VERSION.txt'
+- release it
 
 - use 'optparse' instead of 'getopt'
 
-- regenerate "doc/api"
-
-- add better error handling in 'main()' and/or in the plug-ins
-  themselves. At least, I would like a global "try:... except:..."
-  clause in 'xim.py:main()'.
+- add the ability to process all collected items concurrently (ant not
+  iteratively, as it is now). I have ideas and running prototype code
+  for that.
 
 - add plug-in listing features, and "introspection" of the available
   plug-ins (by printing the docstring of the plug-ins, for example).
