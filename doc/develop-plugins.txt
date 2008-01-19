@@ -1,11 +1,15 @@
+=======================================
 How to develop new plug-ins for Ximenez
 =======================================
 
-FIXME: work in progress (to say the least)
+.. contents:: Table of contents
+   :depth: 1
+   :backlinks: none
+
 
 A plug-in in Ximenez is a class in a Python module. Depending on the
-kind of the plug-in (collector or acion), this class subclasses a
-particular abstract class and implements or overrides certain methods
+kind of the plug-in (collector or action), this class subclasses a
+different abstract class and implements or overrides certain methods
 or attributes of this class.
 
 In other words, creating a new plug-in is only a matter of overriding
@@ -16,112 +20,484 @@ start your new plug-in from the following built-in plug-ins:
 ``collectors/misc/readlines.py`` or ``actions/misc/log.py``.
 
 
-Creating a plug-in
-------------------
+Creating a collector plug-in
+============================
 
-FIXME: 
+Let's suppose that we would like to create a plug-in that collects the
+name of all ``zope.*`` packages registered in the Cheese Shop. First,
+we define a module for our plug-in and a class within. It should
+subclass the appropriately-named ``Collector`` abstract class or, at
+least, implement a ``collect`` method:
+
+.. sourcecode:: python
+
+    >>> from ximenez.collectors.collector import Collector
+    >>>
+    >>> class ZopePackages(Collector):
+    ...     def collect(self):
+    ...         import xmlrpclib
+    ...         server = xmlrpclib.Server('http://pypi.python.org/pypi')
+    ...         packages = server.search({'name':'zope.'})
+    ...         return [i['name'] for i in packages]
+
+In this same module, we need to define a method that returns an
+instance of this plug-in. The following method does the trick:
+
+.. sourcecode:: python
+
+   >>> def getInstance():
+   ...     return ZopePackages()
+
+Since our plug-in does not need any input from the user, that is all
+we need to do.
+
+That said, we may want to set up some tests for it, though:
+
+.. sourcecode:: python
+
+    >>> plugin = getInstance()
+    >>> collected = plugin.collect()
+    >>> 'zope.interface' in collected
+    True
+
+
+Creating an action plug-in
+==========================
+
+Suppose that we want to verify that the last version of each package
+that we have collected with our plug-in above, has a maintainer. For
+that, we will define an action plug-in with a proper implementation.
+
+Action plug-ins are similar to collector plug-ins. The only difference
+is that an action does not have a ``collect()`` method. It has an
+``execute()`` method, though. This method takes a sequence of items
+(which is returned by the collector plug-in) and "does things" on each
+item.
+
+So, as for our collector plug-in, we will define a new module with the
+following code:
+
+.. sourcecode:: python
+
+    >>> from ximenez.actions.action import Action
+    >>>
+    >>> class MaintainerVerifier(Action):
+    ...     def execute(self, packages):
+    ...         import logging
+    ...         import xmlrpclib
+    ...         server = xmlrpclib.Server('http://pypi.python.org/pypi')
+    ...         for package in packages:
+    ...             versions = server.package_releases(package)
+    ...             if not versions: continue
+    ...             infos = server.release_data(package, versions[-1])
+    ...             if infos.get('maintainer'):
+    ...                 logging.warning('Package "%s" has no maintainer.', package)
+
+As for the collector plug-in, we need a ``getPluginInstance()``
+function in our module:
+
+.. sourcecode:: python
+
+    >>> def getPluginInstance():
+    ...     return MaintainerVerifier()
+
+That is about everything we need, except a few tests:
+
+.. sourcecode:: python
+
+    >>> verifier = getPluginInstance()
+    >>> verifier.execute(collected[:3])
+
 
 Asking user input
------------------
+=================
 
-FIXME: the sub-sections below are too technical. A developer would
-read the source code if (s)he wants further details. This documentation should focus on ``_input_info`` more thoroughly.
+The example above described plug-ins where we did not need any user
+input. If you need it, however, you may want to use methods defined by
+the ``InputAware`` mixin of the ``input`` module. The ``Collector``
+and ``Action`` abstract class that we have seen above inherit from
+this mixin, so you get its functionalities for free.
 
+First, a fistful of monkey-patches so we can fake user input:
 
-``_input_info``
-...............
+.. sourcecode:: python
 
-Default (inherited) value: ``ximenez.input.InputAware._input_info``
-
-This attribute is a tuple and defines what information the collector
-needs to know about. These informations are usually given by the user
-on the command line, or asked for by the collector itself (see
-``getInput()`` below).
-
-It has a default value (defined in ``ximenez.input.InputAware``, which
-is a mixin of ``Collector``): the empty tuple (``()``). However, since
-explicit is better than implicit, we strongly recommend that you
-override it in your plug-in. The content of this value is more thoroughly
-documented below (see `Asking user input`_).
-
-
-``_multiple_input``
-...................
-
-Default (inherited) value: ``ximenez.input.InputAware._multiple_input``
-
-This boolean tells whether or not the collector accepts multiple
-inputs (as defined in ``input_info``). It defaults to ``False``. If
-set to ``True``, the user will be asked indefinitely for the
-information listed in ``_input_info``, until (s)he presses ^C.
-
-
-``getInput()``
-..............
-
-Default (inherited) value: ``ximenez.input.InputAware.getInput()``
-
-If your plug-in does not need any input, you do not have to override
-this method in your plug-in: the default implementation will ask the
-user for input only if ``_input_info`` is not empty.
-
-If your plug-in does need an input, the user may have a chance to give
-it in the command line, instead of being prompted to enter it. In this
-case, the ``getInput()`` method is called. It defines how the plug-in
-should treat the arguments given in the command line. Default
-implementation is to suppose that the arguments are separated by
-``;;``. E.g.::
-
-    path=file.txt;;userid=bob
-
-For further details, see ``ximenez.input.InputAware.getInput()``. See
-also ``ximenez.collectors.misc.readlines.py`` for an example.
-
-
-Specificities of a collector plug-in
-------------------------------------
-
-FIXME: rewrite this part.
-
-Firstly you have to define a new module (i.e. a new file) and a new
-class within. This class should subclass (at least)
-``collectors.collector.Collector`` and may override the following
-attributes and methods.
+    >>> from fakeinput import FakeInput
+    >>> fake_input = FakeInput()
+    >>> import ximenez.input
+    >>> ximenez.input.xim_raw_input = fake_input
+    >>> ximenez.input.xim_getpass = fake_input
+    >>> xim_raw_input = ximenez.input.xim_raw_input
+    >>> xim_getpass = ximenez.input.xim_getpass
 
 .. note::
 
-    Do not forget to define a ``getInstance()`` function in your
-    module. This function should return an instance of the class of
-    your plug-in.
+    The following doctest will use a few ``fakeinput`` features. You
+    do not need to know how it works to understand the examples. Just
+    note that ``initializeLines()`` sets up an user input scenario and
+    that ``hasFinished()`` checks that the input scenario is
+    successful. For further details about them, read the corresponding
+    module: it has his own documentation.
 
 
-``collect()``
-.............
-
-At last, now that our plug-in knows everything it needs, it is time to
-actually collect things, since that is the very purpose of the
-collector.
-
-The ``collect()`` method shall return a sequence of any type of
-items. It will be up to the action plug-in to treat this sequence as
-it should.
-
-
-Specificities of an action plug-in
+Asking for one set of informations
 ----------------------------------
 
-Action plug-ins are very similar to collector plug-ins. So the
-instructions above also covers the process of creating a new action
-plug-in.
+The most simple usage of the ``InputAware`` is as follows:
 
-The only difference is that an action does not have a ``collect()``
-method. It has an ``execute()`` method, though. This method takes a
-sequence of items (which is returned by the collector plug-in) and
-"does things" on each item.
+.. sourcecode:: python
+
+    >>> from ximenez.input import InputAware
+    >>> class Dummy(InputAware): pass
+    >>> d = Dummy()
+
+Then asks the user for input:
+
+.. sourcecode:: python
+
+    >>> d.getInput()
+
+Input is now in the ``_input`` attribute:
+
+.. sourcecode:: python
+
+    >>> d._input
+    {}
+
+It is an empty mapping, since we did not define any information that
+we wanted to be asked to the user. For that, the only thing that we
+have to do, is to define a mapping which describes these
+informations. We do so by setting the ``_input_info`` attribute, which
+is a list of mappings:
+
+.. sourcecode:: python
+
+    >>> d._input_info = ({
+    ...     'name': 'firstname',
+    ...     'prompt': 'Please enter your first name'}, )
+
+Let's try this very simple example and check that our input is
+processed:
+
+.. sourcecode:: python
+
+    >>> xim_raw_input.initializeLines(('Joe', ))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input
+    {'firstname': 'Joe'}
+
+Note that the ``prompt`` key is required:
+
+.. sourcecode:: python
+
+    >>> d._input_info = ({'name': 'firstname'}, )
+    >>> xim_raw_input.initializeLines(('Joe', ))
+    >>> d.getInput()
+    ... #doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    KeyError: 'prompt'
+
+Naturally, it is possible to ask for multiple informations:
+
+.. sourcecode:: python
+
+    >>> d._input_info = ({
+    ...     'name': 'firstname',
+    ...     'prompt': 'Please enter your first name'},
+    ...   { 'name': 'lastname',
+    ...     'prompt': 'Please enter your last name'}, )
+    >>> xim_raw_input.initializeLines(('Joe', 'Smith'))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input == {'firstname': 'Joe', 'lastname': 'Smith'}
+    True
+
+
+Asking for multiple sets of informations
+----------------------------------------
+
+Taking the example above, we may want to expand it so that the user
+could give the name of all his/her friends, and not only one. To do
+that, we only have to set the ``_multiple_input`` attribute, which is
+set to ``False`` by default:
+
+.. sourcecode:: python
+
+    >>> d._multiple_input
+    False
+    >>> d._multiple_input = True
+
+The input method will now cycle until the user stops by pressing
+``^C``:
+
+.. sourcecode:: python
+
+    >>> xim_raw_input.initializeLines(('Joe', 'Smith',
+    ...                                'Jane', 'Doe',
+    ...                                KeyboardInterrupt))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input == [{'firstname': 'Joe', 'lastname': 'Smith'},
+    ...              {'firstname': 'Jane', 'lastname': 'Doe'}]
+    True
+
+**Important note:** if the user stops the input in the middle of the
+process, the whole input is discarded. For example, if the user enters
+a first name, a last name and another first name but then stops and
+does not enter a second last name, then only the first name will be
+saved ; the second entry will be discarded:
+
+.. sourcecode:: python
+
+    >>> xim_raw_input.initializeLines(('Joe', 'Smith',
+    ...                                'Jane', KeyboardInterrupt))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input == [{'firstname': 'Joe', 'lastname': 'Smith'}]
+    True
+
+That is about all we have to know for a basic usage of
+``InputAware``. In the next section, we will see how to set default
+values, how to validate input, etc.
+
+
+Requiring a value
+-----------------
+
+By default, no value is required. In other words, the user can enter
+an empty value by just typing *Enter*:
+
+.. sourcecode:: python
+
+    >>> d._multiple_input = False
+    >>> d._input_info = ({
+    ...     'name': 'firstname',
+    ...     'prompt': 'Please enter your first name'},
+    ...   { 'name': 'lastname',
+    ...     'prompt': 'Please enter your last name'}, )
+    >>> xim_raw_input.initializeLines(('', ''))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input == {'firstname': '', 'lastname': ''}
+    True
+
+We may want to enforce a value to be provided. To do that, we use the
+``reduired`` key in our mapping:
+
+.. sourcecode:: python
+
+    >>> d._multiple_input = False
+    >>> d._input_info = ({
+    ...     'name': 'firstname',
+    ...     'prompt': 'Please enter your first name',
+    ...     'required': True},
+    ...   { 'name': 'lastname',
+    ...     'prompt': 'Please enter your last name',
+    ...     'required': True})
+    >>> xim_raw_input.initializeLines(('', ))
+    >>> d.getInput()
+    ... #doctest: +IGNORE_EXCEPTION_DETAIL
+    Traceback (most recent call last):
+    ...
+    FakeInputNoMoreLineException
+
+In this case, we see that the user input is not "enough". Let's retry
+with a different scenario, where the user tries not to enter his last
+name twice, and eventually give it up:
+
+.. sourcecode:: python
+
+    >>> xim_raw_input.initializeLines(('Joe', '', '', 'Smith'))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input == {'firstname': 'Joe', 'lastname': 'Smith'}
+    True
+
+
+Providing a default value
+-------------------------
+
+When empty values are accepted, it can be handy to provide a default
+value. Imagine that we are collecting informations about an SSH
+host. We suppose that, if the user does not specify the port, it is
+the default SSH port, i.e. 22:
+
+.. sourcecode:: python
+
+    >>> d._input_info = ({
+    ...     'name': 'host',
+    ...     'prompt': 'Host name',
+    ...     'required': True},
+    ...   { 'name': 'port',
+    ...     'prompt': 'Port number (leave empty for the default port)',
+    ...     'default': '22'})
+    >>> xim_raw_input.initializeLines(('pink', ''))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input == {'host': 'pink', 'port': '22'}
+    True
+
+
+Asking a password
+-----------------
+
+When prompting an user for his/her password (for example), we want the
+input not to be echoed on the user's terminal. To do that, we use the
+``hidden`` key:
+
+.. sourcecode:: python
+
+    >>> d._input_info = ({
+    ...     'name': 'password',
+    ...     'prompt': 'Please enter your password',
+    ...     'hidden': True}, )
+    >>> xim_raw_input.initializeLines(('secret', ))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input
+    {'password': 'secret'}
+
+(There is no tests for that, I do not want to write one, it does
+work. Next!)
+
+
+Validators
+----------
+
+Suppose that we are asking the user for its nickname. However, we
+cannot accept a certain set of abused nicknames. We therefore need the
+``validators`` key:
+
+.. sourcecode:: python
+
+    >>> d._input_info = ({
+    ...     'name': 'nickname',
+    ...     'prompt': 'Please enter an original nick name',
+    ...     'validators': (lambda n: n != 'Kevin',
+    ...                    lambda n: n != 'Neo')}, )
+    >>> xim_raw_input.initializeLines(('Kevin', 'Neo', 'Satchmo'))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input
+    {'nickname': 'Satchmo'}
+
+Above, we have used lambda expressions. However, we can use a
+function, e.g.:
+
+.. sourcecode:: python
+
+    >>> def isAValidNickname(nickname):
+    ...     return nickname not in ('Kevin', 'Neo')
+    >>> d._input_info = ({
+    ...     'name': 'nickname',
+    ...     'prompt': 'Please enter an original nick name',
+    ...     'validators': (isAValidNickname, )}, )
+    >>> xim_raw_input.initializeLines(('Kevin', 'Neo', 'Satchmo'))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input
+    {'nickname': 'Satchmo'}
+
+We can also use a method of the current class and use it as a
+validator. In this case, the value of the ``validators`` key is a
+string:
+
+.. sourcecode:: python
+
+    >>> def isAValidNickname(self, nickname):
+    ...     return nickname not in ('Kevin', 'Neo')
+    >>> Dummy.isAValidNickname = isAValidNickname
+    >>> d._input_info = ({
+    ...     'name': 'nickname',
+    ...     'prompt': 'Please enter an original nick name',
+    ...     'validators': ('isAValidNickname', )}, )
+    >>> xim_raw_input.initializeLines(('Kevin', 'Neo', 'Satchmo'))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input
+    {'nickname': 'Satchmo'}
+
+
+Getting input from the command-line
+-----------------------------------
+
+Sometimes, we may want offer users the possibility to enter values
+from the command-line. For example, suppose that we need the path of a
+file and an action to perform on it:
+
+.. sourcecode:: python
+
+    >>> d._multiple_input = False
+    >>> d._input = {}
+    >>> d._input_info = ({'name': 'path',
+    ...                   'prompt': 'Path of the file'}, 
+    ...                  {'name': 'action',
+    ...                   'prompt': 'Action to perform'},)
+    >>> d.getInput('path=/tmp/file.ext;;action=rm')
+    >>> d._input == {'path': '/tmp/file.ext', 'action': 'rm'}
+    True
+
+This is a generic parsing of command-line options. Naturally, you may
+want to override ``getInput()`` to provide a specific one. For
+example, if you only need the path of the file, you could do something
+like this:
+
+.. sourcecode:: python
+
+    >>> d._input = {}
+    >>> d._input_info = ({'name': 'path',
+    ...                   'prompt': 'Path of the file'}, )
+    >>>
+    >>> def getInput(self, cl_input=None):
+    ...     """Get input from the user if what was provided in the
+    ...     command line (available in ``cl_input``) was not
+    ...     sufficient.
+    ...
+    ...     If a value is given in the command line (``cl_input``), we
+    ...     suppose it is the path of the file.
+    ...     """
+    ...     if cl_input:
+    ...         self._input['path'] = cl_input
+    ...     else:
+    ...         ## Back to the default implementation
+    ...         InputAware.getInput(self, cl_input)
+    >>>
+    >>> Dummy.getInput = getInput
+
+Then you have a specific handling of the command-line value if one is
+provided, and the default method as a fall-back if there is no
+command-line option:
+
+.. sourcecode:: python
+
+    >>> d._input = {}
+    >>> d.getInput('/tmp/file.ext')
+    >>> d._input
+    {'path': '/tmp/file.ext'}
+    >>>
+    >>> xim_raw_input.initializeLines(('/tmp/file.ext', ))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input
+    {'path': '/tmp/file.ext'}
 
 
 Additional comments
--------------------
+===================
 
 Use docstrings in the class(es) and methods of your plug-ins. In the
 future, Ximenez may use them to provide help to the user by displaying

@@ -1,3 +1,4 @@
+=============
 Ximenez usage
 =============
 
@@ -6,7 +7,7 @@ handle.
 
 
 Miscellaneous
--------------
+=============
 
 ``-h``, ``--help``
   Displays an help message and exits.
@@ -16,7 +17,7 @@ Miscellaneous
 
 
 Collector plug-in
------------------
+=================
 
 ``-c <collector>``
   Use ``<collector>`` as the collector plug-in. ``<collector>`` can be
@@ -30,7 +31,7 @@ Collector plug-in
 
 
 Action plug-in
---------------
+==============
 
 ``-a <action>``
   Use ``<action>`` as the action plug-in. ``<collector>`` can be the
@@ -45,7 +46,7 @@ Action plug-in
 
 
 Logging
--------
+=======
 
 ``-o <output-file>``, ``--output <output-file>``
   Logs to ``<ouput-file>`` instead of logging to the standard

@@ -1,5 +1,6 @@
 .. -*- coding: utf-8 -*-
 
+==========================================
 Ximenez : a multi-purpose action performer
 ==========================================
 
@@ -21,7 +22,7 @@ plug-ins and how to develop your own ones.
 
 
 Usage
------
+=====
 
 You can use Ximenez with the following command-line::
 
@@ -42,7 +43,7 @@ details.
 
 
 Plug-ins
---------
+========
 
 The main characteristic of Ximenez is that it can be extended to just
 do what you need to do, by using plug-ins. There are two kinds of
@@ -56,7 +57,7 @@ take a look at the `exhaustive guide`_ to develop your own plug-ins.
 
 
 Requirements
-------------
+============
 
 Ximenez should run under any OS, though some plug-ins may use
 OS-specific features or require special Python packages.
@@ -66,7 +67,7 @@ versions of Python with minor changes.
 
 
 Installation
-------------
+============
 
 If you have ``easy_install``, then the following should do the trick::
 
@@ -78,7 +79,7 @@ For further details, see the `Installation`_ chapter.
 
 
 Subversion repository
----------------------
+=====================
 
 Ximenez source code lives in a Subversion repository. To checkout the
 trunk::
@@ -91,14 +92,14 @@ You can also `browse the sources`_ with the same URL.
 
 
 The name
---------
+========
 
 It all began in Jarrow. One of the cross beams had gone out askew on
 the treddle. And, well, that's all, I guess.
 
 
 Credits
--------
+=======
 
 Ximenez has been written by Damien Baty.
 
@@ -112,7 +113,7 @@ program.
 
 
 License
--------
+=======
 
 Ximenez is copyright 2006-2007 by Damien Baty.
 
