@@ -66,7 +66,7 @@ LOGGING_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
 DEFAULT_TIMEOUT = 3
 socket.setdefaulttimeout(DEFAULT_TIMEOUT)
 
-__version__ = '0.8'
+__version__ = '0.9'
 
 
 def main():
@@ -145,7 +145,7 @@ def main():
     action.getInput(action_input)
     action.execute(sequence)
     elapsed = time.time() - start_time
-    logging.info('Executed action in %d seconds.' % (elapsed))
+    logging.info('Executed action in %d seconds.' % elapsed)
 
 
 if __name__ == "__main__":
