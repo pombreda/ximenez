@@ -1,8 +1,8 @@
 .. -*- coding: utf-8 -*-
 
-==========================================
-Ximenez : a multi-purpose action performer
-==========================================
+=========================================
+Ximenez: a multi-purpose action performer
+=========================================
 
 The purpose of Ximenez is to execute an action on a set of collected
 items. Both the action and the way items are collected, are defined by
@@ -95,7 +95,7 @@ The name
 ========
 
 It all began in Jarrow. One of the cross beams had gone out askew on
-the treddle. And, well, that's all, I guess.
+the treddle.
 
 
 Credits
