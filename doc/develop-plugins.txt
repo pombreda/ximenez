@@ -113,10 +113,10 @@ Asking user input
 =================
 
 The example above described plug-ins where we did not need any user
-input. If you need it, however, you may want to use methods defined by
-the ``InputAware`` mixin of the ``input`` module. The ``Collector``
+input. If we did, however, we may want to use helper methods defined
+in the ``InputAware`` mixin of the ``input`` module. The ``Collector``
 and ``Action`` abstract class that we have seen above inherit from
-this mixin, so you get its functionalities for free.
+this mixin, so we get its functionalities for free.
 
 First, a fistful of monkey-patches so we can fake user input:
 
@@ -136,8 +136,8 @@ First, a fistful of monkey-patches so we can fake user input:
     do not need to know how it works to understand the examples. Just
     note that ``initializeLines()`` sets up an user input scenario and
     that ``hasFinished()`` checks that the input scenario is
-    successful. For further details about them, read the corresponding
-    module: it has his own documentation.
+    successful. For further details about these features, read the
+    ``fakeinput`` module: it contains its own documentation.
 
 
 Asking for one set of informations
@@ -231,8 +231,7 @@ set to ``False`` by default:
     False
     >>> d._multiple_input = True
 
-The input method will now cycle until the user stops by pressing
-``^C``:
+The input method will now loop until the user presses ``^C``:
 
 .. sourcecode:: python
 
@@ -310,7 +309,7 @@ We may want to enforce a value to be provided. To do that, we use the
 
 In this case, we see that the user input is not "enough". Let's retry
 with a different scenario, where the user tries not to enter his last
-name twice, and eventually give it up:
+name twice, and eventually gives it up:
 
 .. sourcecode:: python
 
@@ -376,7 +375,8 @@ Validators
 
 Suppose that we are asking the user for its nickname. However, we
 cannot accept a certain set of abused nicknames. We therefore need the
-``validators`` key:
+``validators`` key. This corresponding value can be a list of
+functions, for example:
 
 .. sourcecode:: python
 
@@ -430,11 +430,26 @@ string:
     >>> d._input
     {'nickname': 'Satchmo'}
 
+As we have seen above, the ``validators`` key is a tuple. It means
+that we can define multiple validators:
+
+    >>> d._input_info = ({
+    ...     'name': 'nickname',
+    ...     'prompt': 'Please enter an original nick name',
+    ...     'validators': (lambda n: not n.startswith('K'),
+    ...                    lambda n: not n.startswith('N')}, )
+    >>> xim_raw_input.initializeLines(('Kevin', 'Neo', 'Satchmo'))
+    >>> d.getInput()
+    >>> xim_raw_input.hasFinished()
+    True
+    >>> d._input
+    {'nickname': 'Satchmo'}
+
 
 Getting input from the command-line
 -----------------------------------
 
-Sometimes, we may want offer users the possibility to enter values
+Sometimes, we may want to offer users the possibility to enter values
 from the command-line. For example, suppose that we need the path of a
 file and an action to perform on it:
 
@@ -450,9 +465,9 @@ file and an action to perform on it:
     >>> d._input == {'path': '/tmp/file.ext', 'action': 'rm'}
     True
 
-This is a generic parsing of command-line options. Naturally, you may
+This is a generic parsing of command-line options. Naturally, we may
 want to override ``getInput()`` to provide a specific one. For
-example, if you only need the path of the file, you could do something
+example, if we only need the path of the file, we could do something
 like this:
 
 .. sourcecode:: python
@@ -477,7 +492,7 @@ like this:
     >>>
     >>> Dummy.getInput = getInput
 
-Then you have a specific handling of the command-line value if one is
+Then we have a specific handling of the command-line value if one is
 provided, and the default method as a fall-back if there is no
 command-line option:
 
