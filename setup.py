@@ -11,6 +11,7 @@ description = description.replace('\n', ' ')
 long_description_file = os.path.join('doc', 'README.txt')
 long_description = open(long_description_file).read().strip()
 
+
 setup(
     name='ximenez',
     version=version,
@@ -29,14 +30,14 @@ setup(
     description=description,
     long_description=long_description,
     license='GNU GPL',
-    classifiers=('Development Status :: 4 - Beta',
+    classifiers=['Development Status :: 4 - Beta',
                  'Intended Audience :: Developers',
                  'Intended Audience :: System Administrators',
                  'License :: OSI Approved :: GNU General Public License (GPL)',
                  'Operating System :: OS Independent',
                  'Programming Language :: Python',
                  'Topic :: System',
-                 'Topic :: Utilities'),
+                 'Topic :: Utilities'],
     keywords='collector action plug-in plugin',
     url='http://code.noherring.com/ximenez',
     download_url='http://cheeseshop.python.org/pypi/ximenez',
