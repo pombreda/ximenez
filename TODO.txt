@@ -1,8 +1,6 @@
-- release it
-
 - use 'optparse' instead of 'getopt'
 
-- add the ability to process all collected items concurrently (ant not
+- add the ability to process all collected items concurrently (and not
   iteratively, as it is now). I have ideas and running prototype code
   for that.
 

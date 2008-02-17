@@ -1,8 +1,8 @@
 List of changes in Ximenez versions
 ===================================
 
-What's new in Ximenez 0.9 (revision FIXME)
-------------------------------------------
+What's new in Ximenez 0.9
+-------------------------
 
 - usual errors are now caught by the Zope-related plug-ins. They now
   log meaningful messages in most cases;
