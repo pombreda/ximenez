@@ -90,7 +90,7 @@ following code:
     ...             versions = server.package_releases(package)
     ...             if not versions: continue
     ...             infos = server.release_data(package, versions[-1])
-    ...             if infos.get('maintainer'):
+    ...             if not infos.get('maintainer'):
     ...                 logging.warning('Package "%s" has no maintainer.', package)
 
 As for the collector plug-in, we need a ``getPluginInstance()``
@@ -112,7 +112,7 @@ That is about everything we need, except a few tests:
 Asking user input
 =================
 
-The example above described plug-ins where we did not need any user
+The examples above described plug-ins where we did not need any user
 input. If we did, however, we may want to use helper methods defined
 in the ``InputAware`` mixin of the ``input`` module. The ``Collector``
 and ``Action`` abstract class that we have seen above inherit from
@@ -249,7 +249,7 @@ The input method will now loop until the user presses ``^C``:
 process, the whole input is discarded. For example, if the user enters
 a first name, a last name and another first name but then stops and
 does not enter a second last name, then only the first name will be
-saved ; the second entry will be discarded:
+saved; the second entry will be discarded:
 
 .. sourcecode:: python
 
@@ -411,8 +411,8 @@ function, e.g.:
     {'nickname': 'Satchmo'}
 
 We can also use a method of the current class and use it as a
-validator. In this case, the value of the ``validators`` key is a
-string:
+validator. In this case, the value of the ``validators`` key is a list
+of strings:
 
 .. sourcecode:: python
 
@@ -432,6 +432,8 @@ string:
 
 As we have seen above, the ``validators`` key is a tuple. It means
 that we can define multiple validators:
+
+.. sourcecode:: python
 
     >>> d._input_info = ({
     ...     'name': 'nickname',
