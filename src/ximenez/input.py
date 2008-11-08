@@ -65,7 +65,7 @@ class InputAware:
             {'path': 'file.txt',
              'userid': 'bob'}
 
-        Errors are not catched and will therefore raise exceptions.
+        Errors are not caught and will therefore raise exceptions.
         """
         if cl_input:
             for pair in cl_input.split(';;'):
